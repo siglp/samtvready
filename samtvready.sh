@@ -35,27 +35,34 @@ fi
 
 # ---------------------------------------------------------------
 
-# constants - configuration "remove" / "convert" / "copy" (default if nothing or bad value) / "exit" (quit the script with exit code 27)
-unsupported_video=convert
-unsupported_audio=convert
-unsupported_subtitles=remove
+# constants - configuration "remove" / "convert" / "copy" (default if nothing or bad value)
+unsupported_video="convert"
+unsupported_audio="convert"
+unsupported_subtitles="remove"
+
+# codec settings for ffmpeg
 unsupported_video_vcodec="-preset slow -vcodec libx265 -crf 23 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2'"
 unsupported_audio_acodec="-acodec eac3 -b:a 1536k"
 unsupported_subtitles_scodec=""
 
-# 0 means optimal
+# number of ffmpeg threads to use - number - 0 means optimal
 ffmpeg_threads=0
 
-# save original streams
+# keep original file?
 keep_original_file=true
+
+# save original streams into defined dir?
 save_original_streams=true
 original_streams_dir="0-original-streams"
 
-# clean temp files
+# clean temp files (delete help files)
 clean_temp_files=true
 
-# loglevel TRACE, DEBUG, INFO, WARNING, ERROR, HIGHEST
-loglevel="INFO"
+# loglevel "TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "HIGHEST"
+loglevel="TRACE"
+
+# logstyle "BFU" / "DEVEL"
+logstyle="DEVEL"
 
 . $config_file
 
@@ -74,14 +81,21 @@ myLog () {
         fi
     done
 
+    local messageLogLevelStr=$1
     resolveLogLevel $loglevel
     definedLogLevel=$?
-    resolveLogLevel $1
+    resolveLogLevel $messageLogLevelStr
     messageLogLevel=$?
 
     if [ $messageLogLevel -ge $definedLogLevel ]
     then
-        echo $myLogMessage
+        if [ "$logstyle" != "DEVEL" ]
+        then
+            echo $myLogMessage
+        else
+            dateTime=`date +"%Y-%m-%d %H:%M:%S.%N"`
+            echo $dateTime $messageLogLevelStr $myLogMessage
+        fi
     fi
 }
 
