@@ -54,9 +54,9 @@ ffmpeg_threads=0
 
 # input fileadditional params for ffmpeg
 # libx
-ffmpeg_input_params=""
+ffmpeg_input_params="-nostdin -fflags +genpts"
 # nvenc
-#ffmpeg_input_params="-hwaccel auto"
+#ffmpeg_input_params="-nostdin -fflags +genpts -hwaccel auto"
 
 # --- VIDEO ---
 # video codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
@@ -1168,8 +1168,7 @@ then
             then
                myLog "WARNING" "Couldn't delete original file in working folder."
             fi
-        else
-        fi 
+        fi
         
         # copy or move original srt
         original_srt_file="$input_file_name.srt"
