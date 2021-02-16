@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------
 
-config_file="/opt/nas/samtvready/samtvready.conf"
+config_file="/opt/samtvready/samtvready.conf"
 
 # ---------------------------------------------------------------
 
@@ -39,11 +39,11 @@ fi
 converted_file_name_suffix="-SamTVReady"
 
 # report file location
-report_file_location="/opt/nas/samtvready/report"
+report_file_location="/opt/samtvready/report"
 
 # working dir
 # not empty - location into which source file will be copied or moved, everything will be converted there and as final it will be copied to original dir
-#working_dir_location="/opt/nas/samtvready/work"
+#working_dir_location="/opt/samtvready/work"
 # empty - work in file directory
 working_dir_location=""
 # if file size is above this value in bytes, working dir will NOT be ever used
@@ -625,7 +625,7 @@ while read line; do
             if [ "$is_matroska" != true ] || [ $result != 0 ]
             then
                 myLog "INFO" "Extracting (ffmpeg) original VIDEO. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]} ... ... ..."
-                cmd="ffmpeg -y -loglevel error -hide_banner -nostats $ffmpeg_input_params -i '$input_file' -threads $ffmpeg_threads -map 0:${indexes_a[$stream_counter]} -vcodec copy -map_metadata -1 '$original_stream_file_name'"
+                cmd="ffmpeg -y -loglevel error -hide_banner -nostats $ffmpeg_input_params -i '$input_file' -threads $ffmpeg_threads -map 0:${indexes_a[$stream_counter]} -vcodec copy -map_metadata -1 -f matroska '$original_stream_file_name'"
                 myLog "DEBUG" "CMD: $cmd"
                 eval $cmd;result=$?
                 myLog "DEBUG" "CMD RESULT: $result"
@@ -804,7 +804,7 @@ while read line; do
             if [ "$is_matroska" != true ] || [ $result != 0 ]
             then
                 myLog "INFO" "Extracting (ffmpeg) original AUDIO. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]} ... ... ..."
-                cmd="ffmpeg -y -loglevel error -hide_banner -nostats $ffmpeg_input_params -i '$input_file' -threads $ffmpeg_threads -map 0:${indexes_a[$stream_counter]} -acodec copy -map_metadata -1 '$original_stream_file_name'"
+                cmd="ffmpeg -y -loglevel error -hide_banner -nostats $ffmpeg_input_params -i '$input_file' -threads $ffmpeg_threads -map 0:${indexes_a[$stream_counter]} -acodec copy -map_metadata -1 -f matroska '$original_stream_file_name'"
                 myLog "DEBUG" "CMD: $cmd"
                 eval $cmd;result=$?
                 myLog "DEBUG" "CMD RESULT: $result"
