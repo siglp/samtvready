@@ -172,7 +172,7 @@ Always change configuration in **samtvready.conf**.
 Batch conversion needs list of full path filenames to convert / check. See file_list_sample.txt.
 You can generate this file with find or create it manually or what ever you want.
 
-Example: ``find . ! \( -name "-SamTVReady*" -name "movie-poster*" -o -name "*original-stream-*" \) -type f``
+Example: ``find ~+ ! \( -name "-SamTVReady*" -name "movie-poster*" -o -name "*original-stream-*" \) -type f``
 
 You can also create cron for periodically check and so on...
 
