@@ -161,7 +161,7 @@ Always change configuration in **samtvready.conf**.
     - ``logstyle="BFU"``
 
 ## Usage
-**!!! ALERT !!!** Usage is on tour own risk. I really recommend to have config option **keep_original_file=true**!!!
+**!!! ALERT !!!** Usage is on your own risk. I really recommend to have config option **keep_original_file=true**!!!
 - Single file check:
     -   ``samtvready /data/movies/MyMovie.avi check_only``
 - Single file conversion:
