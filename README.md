@@ -3,9 +3,11 @@ Scripts for converting media files to be Samsung TV 2018+ ready.
 
 ## Introduction
 Samsung TV from year 2018 doesn't support DivX / XviD video codecs and DTS audio codecs. Don't ask me why. I don't know it and I don't understand that too. Especially DTS "support".
-This scripts can help you to convert your media (video) files to be compatible with Samsung TV 2018+.
+This scripts (**linux shell**) can help you to convert your media (video) files to be compatible with Samsung TV 2018+.
 I am not shell programmer, so it is NOT optimalized for speed, but for functionality.
 In fact you can configure it to convert "every type" to "some another type" (default configuration is for Samsung TV 2018+).
+
+This scripts should work also in windows 10, if you have enabled and installed [WSL](https://ubuntu.com/wsl).
 
 ## Prerequisites
 - **ffmpeg** installed
