@@ -119,7 +119,7 @@ basename=$(basename -- "$input_file_arg")
 input_file_extension="${basename##*.}"
 input_file_name="${basename%.*}"
 input_file="$input_file_name.$input_file_extension"
-input_file_size=$(wc -c "$input_file_arg" | awk '{print $1}')
+input_file_size=$(stat -c %s "$input_file_arg")
 
 # check if file is not converted yet
 if [[ "$input_file_name" = *"$converted_file_name_suffix" ]]
@@ -230,8 +230,6 @@ function readArrayFromString() {
     eval `echo "unset '$1[-1]'"`
     declare -a $1
 }
-
-# read languages
 
 # read common information about track
 
@@ -432,20 +430,22 @@ else
     fi
     config_languages_file="$config_dirname/language-codes.csv"
     myLog "DEBUG" "Config languages file: " $config_languages_file
-    if [ ! -f "$config_languages_file" ] && [ ${#language_codes[@]} -le 0 ]
+    if [ ! -f "$config_languages_file" ]
     then
         myLog "WARNING" "Couldn't find language codes file. It can ends with error during final muxing because of unknown language."
         language_codes+=(["NotDeclared"]="und")
     else
         myLog "INFO" "Loading languages ISO codes from file " $config_languages_file
-        while read line; do
-            # Language name
-            lkey=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
-            # Language ISO code
-            lvalue=`echo $line | awk 'BEGIN { FS="," } { print $2 }'`        
-            # add to map array
-            language_codes+=(["$lkey"]="$lvalue")        
-        done < $config_languages_file
+
+        cmd="readarray -t lines < '$config_languages_file'"
+        myLog "DEBUG" "CMD: $cmd"
+        eval $cmd;result=$?
+        myLog "DEBUG" "CMD RESULT: $result"
+        for line in "${lines[@]}"; do
+            lkey=${line%%,*}
+            lvalue=${line#*,}
+            language_codes+=(["$lkey"]="$lvalue")
+        done
     fi
 
     if [ "$useWorkingDirectory" = true ]
@@ -601,9 +601,10 @@ at_least_one_audio=false
 
 # read info about track and find default track for video
 exists_default_video_track=false
+before_stream_counter=$stream_counter
 while read line; do
     # streams position in original
-    indexes_a[$stream_counter]=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
+    indexes_a[$stream_counter]=${line%%,*}
     # codec, flags, title, language etc.
     readCommonTrackInfo
     
@@ -613,19 +614,20 @@ while read line; do
     fi 
 
     # append +1 to stream counter
-    stream_counter=$(($stream_counter + 1))
+    stream_counter=$((stream_counter + 1))
     
-done < $video_streams_output
+done < "$video_streams_output"
 
-# reset counter
-stream_counter=$((0))
+# reset stream_counter
+myLog "TRACE" "Stream counter before reset: " $stream_counter
+stream_counter=$before_stream_counter
+myLog "TRACE" "Stream counter after reset: " $stream_counter
 
 # prepare video streams
 first=true
 default=false
 while read line; do
-
-    # prepare default
+    # prepare default flag
     if [ "$exists_default_video_track" = true ]
     then
         default="${default_flags_a[$stream_counter]}"
@@ -808,11 +810,11 @@ while read line; do
             myLog "TRACE" "Forced after: " ${fmux_track_forced_flags_a[0]}
 
             myLog "TRACE" "Default before: " ${fmux_track_default_flags_a[0]}
-            fmux_track_default_flags_a[$input_counter]=${fmux_track_default_flags_a[0]}"--default-track '${indexes_a[$stream_counter]}:${default_flags_a[$stream_counter]}' "
+            fmux_track_default_flags_a[0]=${fmux_track_default_flags_a[0]}"--default-track '${indexes_a[$stream_counter]}:${default_flags_a[$stream_counter]}' "
             myLog "TRACE" "Default after: " ${fmux_track_default_flags_a[0]}
 
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
-            fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
+            fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
             
             at_least_one_video=true
@@ -822,18 +824,48 @@ while read line; do
     # append +1 to stream counter
     stream_counter=$(($stream_counter + 1))
 
-done < $video_streams_output
+done < "$video_streams_output"
 
 myLog "TRACE" "At least one video track: " $at_least_one_video 
  
 # ---------------------------------------------------------------
 
-# prepare audio streams
+# read info about track and find default track for audio
+exists_default_audio_track=false
+before_stream_counter=$stream_counter
 while read line; do
     # streams position in original
-    indexes_a[$stream_counter]=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
+    indexes_a[$stream_counter]=${line%%,*}
     # codec, flags, title, language etc.
     readCommonTrackInfo
+    
+    if [ "${default_flags_a[$stream_counter]}" = true ]
+    then
+        exists_default_video_track=true
+    fi 
+
+    # append +1 to stream counter
+    stream_counter=$((stream_counter + 1))
+    
+done < "$audio_streams_output"
+
+# reset stream_counter
+myLog "TRACE" "Stream counter before reset: " $stream_counter
+stream_counter=$before_stream_counter
+myLog "TRACE" "Stream counter after reset: " $stream_counter
+
+# prepare audio streams
+first=true
+while read line; do
+    # prepare default flag
+    if [ "$exists_default_audio_track" = false ]
+    then
+        if [ "$first" = true ]
+        then
+            default_flags_a[$stream_counter]=true
+        fi
+    fi        
+    first=false
 
     # is actual codec supported?
     isAudioCodecSupported ${codecs_a[$stream_counter]};audioCodecSupported=$?
@@ -985,11 +1017,11 @@ while read line; do
             myLog "TRACE" "Forced after: " ${fmux_track_forced_flags_a[0]}
 
             myLog "TRACE" "Default before: " ${fmux_track_default_flags_a[0]}
-            fmux_track_default_flags_a[$input_counter]=${fmux_track_default_flags_a[0]}"--default-track '${indexes_a[$stream_counter]}:${default_flags_a[$stream_counter]}' "
+            fmux_track_default_flags_a[0]=${fmux_track_default_flags_a[0]}"--default-track '${indexes_a[$stream_counter]}:${default_flags_a[$stream_counter]}' "
             myLog "TRACE" "Default after: " ${fmux_track_default_flags_a[0]}
 
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
-            fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
+            fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
             
             at_least_one_audio=true
@@ -1008,7 +1040,7 @@ myLog "TRACE" "At least one audio track: " $at_least_one_audio
 # prepare subtitle streams
 while read line; do
     # streams position in original
-    indexes_a[$stream_counter]=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
+    indexes_a[$stream_counter]=${line%%,*}
     # codec, flags, title, language etc.
     readCommonTrackInfo
 
@@ -1106,11 +1138,11 @@ while read line; do
             myLog "TRACE" "Forced after: " ${fmux_track_forced_flags_a[0]}
 
             myLog "TRACE" "Default before: " ${fmux_track_default_flags_a[0]}
-            fmux_track_default_flags_a[$input_counter]=${fmux_track_default_flags_a[0]}"--default-track '${indexes_a[$stream_counter]}:${default_flags_a[$stream_counter]}' "
+            fmux_track_default_flags_a[0]=${fmux_track_default_flags_a[0]}"--default-track '${indexes_a[$stream_counter]}:${default_flags_a[$stream_counter]}' "
             myLog "TRACE" "Default after: " ${fmux_track_default_flags_a[0]}
 
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
-            fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
+            fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
         fi
     fi
@@ -1211,6 +1243,10 @@ then
                 fmux_inputs_mkvmerge_param+=" $fmux_not_copy_videos_mkvmerge_param $fmux_not_copy_audios_mkvmerge_param $fmux_not_copy_subtitles_mkvmerge_param ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} $fin"
                 first=false
             else
+                myLog "TRACE" "Track languages: ${fmux_track_languages_a[$input_counter]}"
+                myLog "TRACE" "Track forced flags: ${fmux_track_forced_flags_a[$input_counter]}"
+                myLog "TRACE" "Track default flags: ${fmux_track_default_flags_a[$input_counter]}"
+                myLog "TRACE" "Track titles: ${fmux_track_titles_a[$input_counter]}"
                 fmux_inputs_mkvmerge_param+=" ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} $fin"
             fi
             input_counter=$(($input_counter + 1))
