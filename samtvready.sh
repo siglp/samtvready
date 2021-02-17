@@ -277,7 +277,12 @@ function readCommonTrackInfo() {
     then
         languages_a[$stream_counter]="und"
     else
-        languages_a[$stream_counter]=$language
+        language_code=${language_codes[$language]}
+        if [ -z "$language_code" ]
+        then
+            language_code=$language
+        fi
+        languages_a[$stream_counter]=$language_code
     fi
     myLog "DEBUG" "Track language: ${languages_a[$stream_counter]}"
 
@@ -391,6 +396,30 @@ function isSubtitlesCodecSupported() {
 # starting
 myLog "HIGHEST" "Samsung TV 2018+ conversion / check started..."
 
+# load language definitions
+declare -A language_codes
+config_dirname=$(dirname -- "$config_file")
+if [ "$config_dirname" = "." ]
+then
+    config_dirname="$PWD"
+fi
+config_languages_file="$config_dirname/language-codes.csv"
+myLog "DEBUG" "Config languages file: " $config_languages_file
+if [ ! -f "$config_languages_file" ]
+then
+    myLog "WARNING" "Couldn't find language codes file. It can ends with error during final muxing because of unknown language."
+    language_codes+=(["NotDeclared"]="und")
+else
+    while read line; do
+        # Language name
+        lkey=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
+        # Language ISO code
+        lvalue=`echo $line | awk 'BEGIN { FS="," } { print $2 }'`        
+        # add to map array
+        language_codes+=(["$lkey"]="$lvalue")        
+    done < $config_languages_file
+fi
+
 useWorkingDirectory=false
 if [ -d "$working_dir_location" ] 
 then
@@ -408,7 +437,7 @@ working_dirname="."
 if [ "$check_only" = true ]
 then
     myLog "HIGHEST" "Checking: " $input_file
-        myLog "INFO" "Changing directory to: " $input_dirname
+    myLog "INFO" "Changing directory to: " $input_dirname
     eval "cd '$input_dirname'"
 else
     myLog "HIGHEST" "Converting: " $input_file
@@ -491,7 +520,7 @@ if [ -z "$container_type" ]
 then
     container_type="unknown"
 fi
-myLog "TRACE" "Container type: $containlanguageser_type"
+myLog "TRACE" "Container type: $container_type"
 
 is_matroska=false
 if [[ $container_type = *"matroska"* ]]
@@ -733,6 +762,21 @@ while read line; do
                     fi
                 fi
             fi
+            
+            # ffmpeg can generate IDX and SUB files
+            original_stream_file_name_idx="$original_stream_name.idx"
+            if [ -f "$original_stream_file_name_idx" ]
+            then
+                files_with_original_streams_a+=($original_stream_file_name_idx)
+            fi
+
+            # ffmpeg can generate IDX and SUB files
+            original_stream_file_name_sub="$original_stream_name.sub"
+            if [ -f "$original_stream_file_name_sub" ]
+            then
+                files_with_original_streams_a+=($original_stream_file_name_sub)
+            fi
+            
         fi
     else
         # prepare for final output
@@ -895,6 +939,21 @@ while read line; do
                     fi
                 fi
             fi
+
+            # ffmpeg can generate IDX and SUB files
+            original_stream_file_name_idx="$original_stream_name.idx"
+            if [ -f "$original_stream_file_name_idx" ]
+            then
+                files_with_original_streams_a+=($original_stream_file_name_idx)
+            fi
+
+            # ffmpeg can generate IDX and SUB files
+            original_stream_file_name_sub="$original_stream_name.sub"
+            if [ -f "$original_stream_file_name_sub" ]
+            then
+                files_with_original_streams_a+=($original_stream_file_name_sub)
+            fi
+
         fi
     else
         # prepare for final output
@@ -1001,6 +1060,21 @@ while read line; do
                     myLog "ERROR" "Subtitles conversion is NOT implemented. Subtitles wil be removed!!!!"
                 fi
             fi
+
+            # ffmpeg can generate IDX and SUB files
+            original_stream_file_name_idx="$original_stream_name.idx"
+            if [ -f "$original_stream_file_name_idx" ]
+            then
+                files_with_original_streams_a+=($original_stream_file_name_idx)
+            fi
+
+            # ffmpeg can generate IDX and SUB files
+            original_stream_file_name_sub="$original_stream_name.sub"
+            if [ -f "$original_stream_file_name_sub" ]
+            then
+                files_with_original_streams_a+=($original_stream_file_name_sub)
+            fi
+
         fi
     else
         # prepare for final output
@@ -1124,7 +1198,7 @@ then
                 fmux_inputs_mkvmerge_param+=" $fmux_not_copy_videos_mkvmerge_param $fmux_not_copy_audios_mkvmerge_param $fmux_not_copy_subtitles_mkvmerge_param ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} $fin"
                 first=false
             else
-                fmux_inputs_mkvmerge_param+=" ${fmux_track_languages_a[$input_counter]} $fin"
+                fmux_inputs_mkvmerge_param+=" ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} $fin"
             fi
             input_counter=$(($input_counter + 1))
         done

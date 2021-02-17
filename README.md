@@ -24,12 +24,14 @@ This scripts should work also in Windows 10, if you have enabled and installed [
     - **samtvready.sh**
     - **samtvready.conf**
     - **samtvready-batch.sh**
+    - **language-codes.csv**
 3. If you choose some another location, you must change it also in **samtvready.sh** (for including config file)
     - ``config_file="/opt/samtvready/samtvready.conf"``
 4. Make a symbolic link in **/usr/local/sbin** to **samtvready.sh** and **samtvready-batch.sh**
     - ``sudo ln -s /opt/samtvready/samtvready.sh /usr/local/sbin/samtvready``
     - ``sudo ln -s /opt/samtvready/samtvready-batch.sh /usr/local/sbin/samtvready-batch``
 5. Edit **samtvready.conf** for your own usage
+6. Copy **language-codes.csv** to the same location as **samtvready.conf**
 
 ## Configuration
 Always change configuration in **samtvready.conf**.
