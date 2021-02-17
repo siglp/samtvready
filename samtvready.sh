@@ -618,7 +618,7 @@ while read line; do
             fmux_not_copy_videos_a+=(${indexes_a[$stream_counter]})
             
             # prepare extract original stream
-            original_stream_name="$input_file_name-original-${codecs_a[$stream_counter]}-${languages_a[$stream_counter]}-${indexes_a[$stream_counter]}"
+            original_stream_name="$input_file_name-original-stream-${codecs_a[$stream_counter]}-${languages_a[$stream_counter]}-${indexes_a[$stream_counter]}"
             original_stream_file_name="$original_stream_name.mkv"
             original_stream_file_name_converted="$original_stream_name-converted.mkv"
 
@@ -797,7 +797,7 @@ while read line; do
             fmux_not_copy_audios_a+=(${indexes_a[$stream_counter]})
             
             # prepare extract original stream
-            original_stream_name="$input_file_name-original-${codecs_a[$stream_counter]}-${languages_a[$stream_counter]}-${indexes_a[$stream_counter]}"
+            original_stream_name="$input_file_name-original-stream-${codecs_a[$stream_counter]}-${languages_a[$stream_counter]}-${indexes_a[$stream_counter]}"
             original_stream_file_name="$original_stream_name.mka"
             original_stream_file_name_converted="$original_stream_name-converted.mka"
 
@@ -958,7 +958,7 @@ while read line; do
             fmux_not_copy_subtitles_a+=(${indexes_a[$stream_counter]})
             
             # prepare extract original stream
-            original_stream_name="$input_file_name-original-${codecs_a[$stream_counter]}-${languages_a[$stream_counter]}-${indexes_a[$stream_counter]}"
+            original_stream_name="$input_file_name-original-stream-${codecs_a[$stream_counter]}-${languages_a[$stream_counter]}-${indexes_a[$stream_counter]}"
             original_stream_file_name="$original_stream_name.sup"
             original_stream_file_name_converted="$original_stream_name-converted.sup"
 
