@@ -1283,7 +1283,7 @@ then
                myLog "WARNING" "Couldn't delete original file."
             fi
         
-            if [ -f "$original_srt_file" ]
+            if [ -f "$input_dirname/$original_srt_file" ]
             then
                 cmd="mv '$input_dirname/$original_srt_file' '$input_dirname/$converted_srtfile'"
                 myLog "DEBUG" "CMD: $cmd"
@@ -1295,7 +1295,7 @@ then
                 fi
             fi
         else
-            if [ -f "$original_srt_file" ]
+            if [ -f "$input_dirname/$original_srt_file" ]
             then
                 cmd="cp '$input_dirname/$original_srt_file' '$input_dirname/$converted_srtfile'"
                 myLog "DEBUG" "CMD: $cmd"
