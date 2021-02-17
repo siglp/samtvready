@@ -76,6 +76,8 @@ unsupported_video_2160p_params="-preset slow -vcodec libx265 -cq 24 -vf 'pad=cei
 #unsupported_video_720p_params="-preset slow -vcodec h264_nvenc -cq 21 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"
 #unsupported_video_1080p_params="-preset slow -vcodec hevc_nvenc -cq 22 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"
 #unsupported_video_2160p_params="-preset slow -vcodec hevc_nvenc -cq 24 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"
+# report VOB files
+report_vob_files=true
 
 # --- AUDIO ---
 # audio codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
@@ -499,9 +501,17 @@ myLog "TRACE" "Is matroska file: $is_matroska"
 
 if [ ! -f "$report_file_name" ]
 then
-    touch $report_file_name
+    cmd="touch $report_file_name"
+    myLog "DEBUG" "CMD: $cmd"
+    eval $cmd;result=$?
+    myLog "DEBUG" "CMD RESULT: $result"
 fi
 myLog "TRACE" "Report file name: " $report_file_name
+
+if [ "$report_vob_files" = true ] && [ "$input_file_extension" = *"VOB" ]
+then
+    echo "VOB,$input_dirname,$input_file" >> $report_file_name
+fi
 
 # help file names
 streams_output=streams_output.txt
@@ -1268,6 +1278,8 @@ then
         done
     fi
 fi
+
+# ---------------------------------------------------------------
 
 cmd="cd '$start_dirname'"
 myLog "DEBUG" "CMD: $cmd"
