@@ -61,8 +61,8 @@ Always change configuration in **samtvready.conf**.
     - ``ffmpeg_threads=0``
 - **ffmpeg_input_params**
     - additional params for ffmpeg used as global params (before -i option)
-    - **libx** ex: ``ffmpeg_input_params="-nostdin -fflags +genpts"``
-    - **nvenc** ex: ``ffmpeg_input_params="-nostdin -fflags +genpts -hwaccel auto"``
+    - **libx** ex:``ffmpeg_input_params="-nostdin -fflags +genpts"``
+    - **nvenc** ex:``ffmpeg_input_params="-nostdin -fflags +genpts -hwaccel auto"``
 - **supported_video_codecs**
     - comma separated list of video codecs, which are supported => will not be converted
     - ``supported_video_codecs="hevc,h264,av1"``
@@ -76,24 +76,24 @@ Always change configuration in **samtvready.conf**.
     - ``unsupported_video="convert"``
 - **unsupported_video_480p_params**
     - params for ffmpeg conversion used for video streams with resolution 480p and less
-    - ``unsupported_video_480p_params="-preset slow -vcodec libx264 -cq 19 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
-    - ``unsupported_video_480p_params="-preset slow -vcodec h264_nvenc -cq 19 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **libx** ex:``unsupported_video_480p_params="-preset slow -vcodec libx264 -cq 19 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **nvenc** ex:``unsupported_video_480p_params="-preset slow -vcodec h264_nvenc -cq 19 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
 - **unsupported_video_576p_params**
     - params for ffmpeg conversion used for video streams with resolution 576p
-    - ``unsupported_video_576p_params="-preset slow -vcodec libx264 -cq 20 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **libx** ex:``unsupported_video_576p_params="-preset slow -vcodec libx264 -cq 20 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
     - ``unsupported_video_576p_params="-preset slow -vcodec h264_nvenc -cq 20 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
 - **unsupported_video_720p_params**
     - params for ffmpeg conversion used for video streams with resolution 720p - HD
-    - ``unsupported_video_720p_params="-preset slow -vcodec libx264 -cq 21 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
-    - ``unsupported_video_720p_params="-preset slow -vcodec h264_nvenc -cq 21 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **libx** ex:``unsupported_video_720p_params="-preset slow -vcodec libx264 -cq 21 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **nvenc** ex:``unsupported_video_720p_params="-preset slow -vcodec h264_nvenc -cq 21 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
 - **unsupported_video_1080p_params**
     - params for ffmpeg conversion used for video streams with resolution 1080p - Full HD
-    - ``unsupported_video_1080p_params="-preset slow -vcodec libx265 -cq 22 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
-    - ``unsupported_video_1080p_params="-preset slow -vcodec hevc_nvenc -cq 22 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **libx** ex:``unsupported_video_1080p_params="-preset slow -vcodec libx265 -cq 22 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **nvenc** ex:``unsupported_video_1080p_params="-preset slow -vcodec hevc_nvenc -cq 22 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
 - **unsupported_video_2160p_params**
     - params for ffmpeg conversion used for video streams with resolution 2160p - UHD / 4K
-    - ``unsupported_video_2160p_params="-preset slow -vcodec libx265 -cq 24 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
-    - ``unsupported_video_2160p_params="-preset slow -vcodec hevc_nvenc -cq 24 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **libx** ex:``unsupported_video_2160p_params="-preset slow -vcodec libx265 -cq 24 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
+    - **nvenc** ex:``unsupported_video_2160p_params="-preset slow -vcodec hevc_nvenc -cq 24 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"``
 - **report_vob_files**
     - boolean value which indicates if you want to report *.VOB files (DVD)
     - it can be useful, when you want concat result in one file: [ffmpeg concatenate](https://trac.ffmpeg.org/wiki/Concatenate)
