@@ -119,7 +119,7 @@ Always change configuration in **samtvready.conf**.
     - ``unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k -ac 6"``
 - **supported_subtitles_codecs=**
     - comma separated list of subtitle formats, which are supported => will not be converted
-    - ``supported_subtitles_codecs="subrip,srt,ass,ssa"``
+    - ``supported_subtitles_codecs="subrip,srt,ass,ssa,dvd_subtitle"``
 - **unsupported_subtitles**
     - mode/action for unsupported subtitles
     - **remove** - remove stream from final file
