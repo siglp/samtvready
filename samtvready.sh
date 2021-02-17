@@ -280,7 +280,7 @@ function readCommonTrackInfo() {
         language_code=${language_codes[$language]}
         if [ -z "$language_code" ]
         then
-            language_code=$language
+            language_code="und"
         fi
         languages_a[$stream_counter]=$language_code
     fi
@@ -405,7 +405,7 @@ then
 fi
 config_languages_file="$config_dirname/language-codes.csv"
 myLog "DEBUG" "Config languages file: " $config_languages_file
-if [ ! -f "$config_languages_file" ]
+if [ ! -f "$config_languages_file" ] && [ ${#language_codes[@]} -le 0 ]
 then
     myLog "WARNING" "Couldn't find language codes file. It can ends with error during final muxing because of unknown language."
     language_codes+=(["NotDeclared"]="und")
