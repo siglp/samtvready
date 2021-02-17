@@ -235,7 +235,7 @@ function readArrayFromString() {
 
 function readCommonTrackInfo() {
     # default flag
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_disposition=default -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_disposition=default -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local default=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -248,7 +248,7 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "Track default flag: ${default_flags_a[$stream_counter]}"
 
     # forced flag
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_disposition=forced -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_disposition=forced -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local forced=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -261,7 +261,7 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "Track forced flag: ${forced_flags_a[$stream_counter]}"
 
     # title
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_tags=title -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_tags=title -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local title=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -269,7 +269,7 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "Track title: ${titles_a[$stream_counter]}"
 
     # language
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_tags=language -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream_tags=language -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     language=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -282,7 +282,7 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "Track language: ${languages_a[$stream_counter]}"
 
     # codec type
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=codec_name -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=codec_name -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local codec=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -294,7 +294,7 @@ function readCommonTrackInfo() {
 
 function readVideoTrackInfo() {
     # video height
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=height -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=height -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local height=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -302,7 +302,7 @@ function readVideoTrackInfo() {
     myLog "DEBUG" "Track video height: ${heights_a[$stream_counter]}"
 
     # video width
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=width -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=width -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local width=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -310,7 +310,7 @@ function readVideoTrackInfo() {
     myLog "DEBUG" "Track video width: ${widths_a[$stream_counter]}"
 
     # interlaced
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=field_order -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=field_order -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local field_order=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -323,7 +323,7 @@ function readVideoTrackInfo() {
     myLog "DEBUG" "Track interlaced flag: ${interlaced_flags_a[$stream_counter]}"
 
     # pixel format
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=pix_fmt -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=pix_fmt -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local pixel_format=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -335,7 +335,7 @@ function readVideoTrackInfo() {
 
 function readAudioTrackInfo() {
     # number of channels format
-    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=channels -of csv=s=,:p=0 $input_file"
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=channels -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
     local channels=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
@@ -407,11 +407,11 @@ myLog "TRACE" "Use working direcotry: " $useWorkingDirectory
 working_dirname="."
 if [ "$check_only" = true ]
 then
-    myLog "HIGHEST" "Checking $input_file."
-    myLog "INFO" "Changing directory to: " $input_dirname
+    myLog "HIGHEST" "Checking: " $input_file
+        myLog "INFO" "Changing directory to: " $input_dirname
     eval "cd '$input_dirname'"
 else
-    myLog "HIGHEST" "Converting $input_file."
+    myLog "HIGHEST" "Converting: " $input_file
     if [ "$useWorkingDirectory" = true ]
     then
         working_dirname=$working_dir_location
@@ -1037,6 +1037,8 @@ done < "$subtitle_streams_output"
 
 if [ "$check_only" = false ]
 then
+    myLog "TRACE" "At least one video: " $at_least_one_video
+    myLog "TRACE" "At least one audio: " $at_least_one_audio
     if [ "$at_least_one_video" = true ] && [ "$at_least_one_audio" = true ]
     then
         # not copied video tracks from original
@@ -1151,7 +1153,7 @@ then
         # eval not working here, don't know why
         eval $fmux_cmd;fmux_result=$?
         myLog "DEBUG" "CMD RESULT: " $fmux_result
-        if [ "$fmux_result" -ne 1 ]
+        if [ "$fmux_result" -ge 2 ]
         then
             myLog "ERROR" "Samsung TV 2018+ conversion wasn't successful... (all temp files etc. are not deleted - you can check them)"
             cmd="cd '$start_dirname'"
