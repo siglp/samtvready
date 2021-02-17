@@ -231,6 +231,8 @@ function readArrayFromString() {
     declare -a $1
 }
 
+# read languages
+
 # read common information about track
 
 function readCommonTrackInfo() {
@@ -396,30 +398,6 @@ function isSubtitlesCodecSupported() {
 # starting
 myLog "HIGHEST" "Samsung TV 2018+ conversion / check started..."
 
-# load language definitions
-declare -A language_codes
-config_dirname=$(dirname -- "$config_file")
-if [ "$config_dirname" = "." ]
-then
-    config_dirname="$PWD"
-fi
-config_languages_file="$config_dirname/language-codes.csv"
-myLog "DEBUG" "Config languages file: " $config_languages_file
-if [ ! -f "$config_languages_file" ] && [ ${#language_codes[@]} -le 0 ]
-then
-    myLog "WARNING" "Couldn't find language codes file. It can ends with error during final muxing because of unknown language."
-    language_codes+=(["NotDeclared"]="und")
-else
-    while read line; do
-        # Language name
-        lkey=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
-        # Language ISO code
-        lvalue=`echo $line | awk 'BEGIN { FS="," } { print $2 }'`        
-        # add to map array
-        language_codes+=(["$lkey"]="$lvalue")        
-    done < $config_languages_file
-fi
-
 useWorkingDirectory=false
 if [ -d "$working_dir_location" ] 
 then
@@ -441,6 +419,32 @@ then
     eval "cd '$input_dirname'"
 else
     myLog "HIGHEST" "Converting: " $input_file
+
+    # load language definitions
+    declare -A language_codes
+    config_dirname=$(dirname -- "$config_file")
+    if [ "$config_dirname" = "." ]
+    then
+        config_dirname="$PWD"
+    fi
+    config_languages_file="$config_dirname/language-codes.csv"
+    myLog "DEBUG" "Config languages file: " $config_languages_file
+    if [ ! -f "$config_languages_file" ] && [ ${#language_codes[@]} -le 0 ]
+    then
+        myLog "WARNING" "Couldn't find language codes file. It can ends with error during final muxing because of unknown language."
+        language_codes+=(["NotDeclared"]="und")
+    else
+        myLog "INFO" "Loading languages ISO codes from file " $config_languages_file
+        while read line; do
+            # Language name
+            lkey=`echo $line | awk 'BEGIN { FS="," } { print $1 }'`
+            # Language ISO code
+            lvalue=`echo $line | awk 'BEGIN { FS="," } { print $2 }'`        
+            # add to map array
+            language_codes+=(["$lkey"]="$lvalue")        
+        done < $config_languages_file
+    fi
+
     if [ "$useWorkingDirectory" = true ]
     then
         working_dirname=$working_dir_location
