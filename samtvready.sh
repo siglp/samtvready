@@ -1226,7 +1226,7 @@ then
 
     myLog "TRACE" "Files with original streams: " ${files_with_original_streams_a[@]}
     # save original streams
-    if [ "$save_original_streams" = true ]
+    if [ "$save_original_streams" = true ] && [ ${#files_with_original_streams_a[@]} -gt 0 ]
     then
         cmd="mkdir -p '$input_dirname/$original_streams_dir'"
         myLog "DEBUG" "CMD: $cmd"
