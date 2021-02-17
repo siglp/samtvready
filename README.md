@@ -7,7 +7,7 @@ This scripts (**linux shell**) can help you to convert your media (video) files 
 I am not shell programmer, so it is NOT optimalized for speed, but for functionality.
 In fact you can configure it to convert "every type" to "some another type" (default configuration is for Samsung TV 2018+).
 
-This scripts should work also in windows 10, if you have enabled and installed [WSL](https://ubuntu.com/wsl).
+This scripts should work also in Windows 10, if you have enabled and installed [WSL](https://ubuntu.com/wsl).
 
 ## Prerequisites
 - **ffmpeg** installed
