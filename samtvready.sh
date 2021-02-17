@@ -37,6 +37,7 @@ fi
 
 # converted file name suffix
 converted_file_name_suffix="-SamTVReady"
+converted_title_suffix=" converted for Samsung TV 2018+"
 
 # report file location
 report_file_location="/opt/samtvready/report"
@@ -86,7 +87,7 @@ supported_audio_codecs="aac,aac_latm,ac3,eac3"
 unsupported_audio="convert"
 # conversion params for ffmpeg
 unsupported_audio_lq_acodec="-acodec aac -b:a 192k"
-unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k"
+unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k -ac 6"
 
 # --- SUBTITLE ---
 # subtitle codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
@@ -842,7 +843,7 @@ while read line; do
                     
                     if [ "${channels_a[$stream_counter]}" -gt 6 ]
                     then
-                        unsupported_audio_acodec_params="$unsupported_audio_hq_acodec -ac 6"
+                        unsupported_audio_acodec_params="$unsupported_audio_hq_acodec"
                     fi
 
                     if [ "${channels_a[$stream_counter]}" -le 2 ]
@@ -1145,7 +1146,7 @@ then
         
         myLog "INFO" "Final muxing streams to $converted_file ... ... ..."
         # eval not working here, don't know why
-        fmux_cmd="mkvmerge -o '$converted_file' $fmux_inputs_mkvmerge_param --track-order '$fmux_tracks_mkvmerge_param' --title '$input_file_name converted for Samsung TV 2018+'"
+        fmux_cmd="mkvmerge -o '$converted_file' $fmux_inputs_mkvmerge_param --track-order '$fmux_tracks_mkvmerge_param' --title '$main_title $converted_title_suffix'"
         myLog "DEBUG" "FINAL MUX CMD: " $fmux_cmd
         # eval not working here, don't know why
         eval $fmux_cmd;fmux_result=$?
