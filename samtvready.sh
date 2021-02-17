@@ -267,7 +267,7 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "CMD: $cmd"
     local title=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
-      titles_a[$stream_counter]=$title
+    titles_a[$stream_counter]=$title
     myLog "DEBUG" "Track title: ${titles_a[$stream_counter]}"
 
     # language
@@ -416,7 +416,10 @@ if [ "$check_only" = true ]
 then
     myLog "HIGHEST" "Checking: " $input_file
     myLog "INFO" "Changing directory to: " $input_dirname
-    eval "cd '$input_dirname'"
+    cmd="cd '$input_dirname'"
+    myLog "DEBUG" "CMD: $cmd"
+    eval $cmd;result=$?
+    myLog "DEBUG" "CMD RESULT: $result"
 else
     myLog "HIGHEST" "Converting: " $input_file
 
@@ -451,21 +454,25 @@ else
         cmd="cd '$working_dirname'"
         myLog "DEBUG" "CMD: $cmd"
         eval $cmd;result=$?
+        myLog "DEBUG" "CMD RESULT: $result"
         if [ "$keep_original_file" = true ]
         then
             cmd="cp '$input_dirname/$input_file' '$working_dirname/$input_file'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
+            myLog "DEBUG" "CMD RESULT: $result"
         else
             cmd="mv '$input_dirname/$input_file' '$working_dirname/$input_file'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
+            myLog "DEBUG" "CMD RESULT: $result"
         fi
     else
         working_dirname=$input_dirname
         cmd="cd '$working_dirname'"
         myLog "DEBUG" "CMD: $cmd"
         eval $cmd;result=$?
+        myLog "DEBUG" "CMD RESULT: $result"
     fi
 fi
 myLog "TRACE" "Working dir name:" $working_dirname
@@ -509,7 +516,8 @@ fmux_inputs_a+=("'$input_file'")
 # title
 cmd="ffprobe -v quiet -show_entries format_tags=title -of csv=s=,:p=0 -i '$input_file'"
 myLog "DEBUG" "CMD: $cmd"
-main_title=`eval $cmd`
+main_title=`eval $cmd;result=$?`
+myLog "DEBUG" "CMD RESULT: $result"
 if [ -z "$main_title" ]
 then
     main_title=$input_file_name
@@ -519,7 +527,8 @@ myLog "TRACE" "Main title: $main_title"
 # container type
 cmd="ffprobe -v quiet -show_entries format=format_name -of csv=s=,:p=0 -i '$input_file'"
 myLog "DEBUG" "CMD: $cmd"
-container_type=`eval $cmd`
+container_type=`eval $cmd;result=$?`
+myLog "DEBUG" "CMD RESULT: $result"
 if [ -z "$container_type" ]
 then
     container_type="unknown"
@@ -1223,12 +1232,11 @@ then
             fi
         done
         myLog "TRACE" "${fmux_tracks_mkvmerge_param}"
-        
+
+        # final mux        
         myLog "INFO" "Final muxing streams to $converted_file ... ... ..."
-        # eval not working here, don't know why
         fmux_cmd="mkvmerge -o '$converted_file' $fmux_inputs_mkvmerge_param --track-order '$fmux_tracks_mkvmerge_param' --title '$main_title $converted_title_suffix'"
         myLog "DEBUG" "FINAL MUX CMD: " $fmux_cmd
-        # eval not working here, don't know why
         eval $fmux_cmd;fmux_result=$?
         myLog "DEBUG" "CMD RESULT: " $fmux_result
         if [ "$fmux_result" -ge 2 ]
@@ -1237,6 +1245,7 @@ then
             cmd="cd '$start_dirname'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
+            myLog "DEBUG" "CMD RESULT: $result"            
             exit -1
         fi
         
