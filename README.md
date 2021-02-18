@@ -174,7 +174,7 @@ Always change configuration in **samtvready.conf**.
 Batch conversion needs list of full path filenames to convert / check. See file_list_sample.txt.
 You can generate this file with find or create it manually or what ever you want.
 
-Example: ``find ~+ ! \( -name "*-SamTVReady*" -o -name "*movie-poster*" -o -name "*original-stream-*" -o -name "*.srt" \) -type f > animovane.txt``
+Example: ``find ~+ ! \( -name "*-SamTVReady*" -o -name "*movie-poster*" -o -name "*original-stream-*" -o -name "*.srt" \) -type f > movies.txt``
 
 You can also create cron for periodically check and so on...
 
