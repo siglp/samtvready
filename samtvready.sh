@@ -272,6 +272,7 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "CMD: $cmd"
     local title=`eval $cmd;result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
+    title=${title/\'/"-"}
     titles_a[$stream_counter]=$title
     myLog "DEBUG" "Track title: ${titles_a[$stream_counter]}"
 
@@ -564,6 +565,7 @@ if [ -z "$main_title" ]
 then
     main_title=$input_file_name
 fi
+main_title=${main_title/\'/"-"}
 myLog "TRACE" "Main title: $main_title"
 
 # container type
@@ -1252,6 +1254,8 @@ done < "$subtitle_streams_output"
 
 # ---------------------------------------------------------------
 
+final_exit_code=0
+
 if [ "$check_only" = false ]
 then
     myLog "TRACE" "At least one video: " $at_least_one_video
@@ -1443,6 +1447,7 @@ then
         fi
     else
         myLog "ERROR" "Samsung TV 2018+ conversion wasn't successful. There is NOT at least one audio and one video track."
+        final_exit_code=-1
     fi
 
     myLog "TRACE" "Files with original streams: " ${files_with_original_streams_a[@]}
@@ -1460,6 +1465,7 @@ then
 
         for osfn in "${files_with_original_streams_a[@]}"
         do
+
             cmd="mv '$osfn' '$input_dirname/$original_streams_dir'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
@@ -1473,6 +1479,7 @@ then
     else
         for osfn in "${files_with_original_streams_a[@]}"
         do
+
             cmd="rm -rf '$osfn'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
@@ -1491,6 +1498,7 @@ then
     then
         for osfn in "${files_with_temp_data_a[@]}"
         do
+            
             cmd="rm -rf '$osfn'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
@@ -1499,6 +1507,7 @@ then
             then
                 myLog "WARNING" "Couldn't delete temp file."
             fi
+            
         done
     fi
 fi
@@ -1511,4 +1520,4 @@ eval $cmd;result=$?
 
 myLog "HIGHEST" "Samsung TV 2018+ conversion / check finished."
 
-exit 0
+exit $final_exit_code
