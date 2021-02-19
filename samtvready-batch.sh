@@ -28,6 +28,8 @@ echo "Samsung TV 2018+ BATCH conversion / check started..."
 # ---------------------------------------------------------------
 
 # read info about track and find default track for video
+declare -a errors
+hasErrors=false
 while read line; do
 
     echo "--------------------------- Start: $line ---------------------------" 
@@ -38,6 +40,8 @@ while read line; do
     if [ $result != 0 ]
     then
         echo "ERROR: Conversion of file $line ends with some error."
+        errors+=("$line") 
+        hasErrors=true;
     fi
 
     echo "--------------------------- End: $line ---------------------------"
@@ -46,6 +50,12 @@ done < $input_file
 
 # ---------------------------------------------------------------
 
-echo "Samsung TV 2018+ BATCH conversion / check finished."
+if [ "$hasErrors" = false ]
+then
+    echo "Samsung TV 2018+ BATCH conversion / check finished."
+else
+    echo "Samsung TV 2018+ BATCH conversion / check finished with ERRORS for some inputs. See below:"
+    echo ${errors[@]}
+fi
 
 exit 0
