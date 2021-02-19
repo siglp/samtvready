@@ -100,7 +100,10 @@ Always change configuration in **samtvready.conf**.
     - boolean value which indicates if you want to report *.VOB files (DVD)
     - it can be useful, when you want concat result in one file: [ffmpeg concatenate](https://trac.ffmpeg.org/wiki/Concatenate)
     - ``report_vob_files=true``
-- **supported_audio_codecs=**
+- **mux_without_video**
+    - boolean value which indicates, that you want mux final media file even if there is no valid (converted or original) video
+    - ``mux_without_video=false``
+- **supported_audio_codecs**
     - comma separated list of audio codecs, which are supported => will not be converted
     - ``supported_audio_codecs="aac,aac_latm,ac3,eac3"``
 - **unsupported_audio**
@@ -112,11 +115,21 @@ Always change configuration in **samtvready.conf**.
     - **report** - report unsupported stream into report file and do any conversion
     - ``unsupported_audio="convert"``
 - **unsupported_audio_lq_acodec**
-    - params for ffmpeg conversion used for audio streams with lq sound (no. of channels less then 5.1)
+    - params for ffmpeg conversion used for audio streams with lq (low quality) sound (no. of channels less then 5.1, bitrate below **lq_sq_bitrate_border**)
     - ``unsupported_audio_lq_acodec="-acodec aac -b:a 192k"``
+- **unsupported_audio_sq_acodec**
+    - params for ffmpeg conversion used for audio streams with sq (standard quality) sound (no. of channels less then 5.1, bitrate above **lq_sq_bitrate_border**)
+    - ``unsupported_audio_sq_acodec="-acodec aac -b:a 448k"``
 - **unsupported_audio_hq_acodec**
-    - params for ffmpeg conversion used for audio streams with lq sound (no. of channels more or equal 5.1)
+    - params for ffmpeg conversion used for audio streams with hq (high quality) sound (no. of channels more or equal 5.1)
     - ``unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k -ac 6"``
+- **lq_sq_bitrate_border**
+    - border for lq (low quality) and sq (standard quality)
+    - sound with 2 (or less) channels and bitrate below this border will be lq, above this border will be sq
+    - ``lq_sq_bitrate_border=192000``
+- **mux_without_audio**
+    - boolean value which indicates, that you want mux final media file even if there is no valid (converted or original) audio
+    - ``mux_without_audio=false``
 - **supported_subtitles_codecs=**
     - comma separated list of subtitle formats, which are supported => will not be converted
     - ``supported_subtitles_codecs="subrip,srt,ass,ssa,dvd_subtitle"``

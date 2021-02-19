@@ -79,6 +79,8 @@ unsupported_video_2160p_params="-preset slow -vcodec libx265 -cq 24 -vf 'pad=cei
 #unsupported_video_2160p_params="-preset slow -vcodec hevc_nvenc -cq 24 -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -pix_fmt yuv420p"
 # report VOB files
 report_vob_files=true
+# mux without video
+mux_without_video=false
 
 # --- AUDIO ---
 # audio codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
@@ -87,7 +89,12 @@ supported_audio_codecs="aac,aac_latm,ac3,eac3"
 unsupported_audio="convert"
 # conversion params for ffmpeg
 unsupported_audio_lq_acodec="-acodec aac -b:a 192k"
+unsupported_audio_sq_acodec="-acodec aac -b:a 448k"
 unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k -ac 6"
+# border for lq vs sq in bit/s
+lq_sq_bitrate_border=192000
+# mux without audio
+mux_without_audio=false
 
 # --- SUBTITLE ---
 # subtitle codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
@@ -293,6 +300,21 @@ function readCommonTrackInfo() {
     myLog "DEBUG" "CMD RESULT: $result"
     codecs_a[$stream_counter]=$codec
     myLog "DEBUG" "Track codec: ${codecs_a[$stream_counter]}"
+
+    # bitrate
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=bit_rate -of csv=s=,:p=0 '$input_file'"
+    myLog "DEBUG" "CMD: $cmd"
+    local bitrate=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    myLog "DEBUG" "CMD RESULT: $result"
+    re='^[0-9]+$'
+    if ! [[ $bitrate =~ $re ]]
+    then
+        bitrates_a[$stream_counter]=128000
+        myLog "DEBUG" "Bitrate for stream is not defined, using 128k"
+    else
+        bitrates_a[$stream_counter]=$bitrate
+    fi
+    myLog "DEBUG" "Track bitrate: ${bitrates_a[$stream_counter]}"
 }
 
 # read video information about track
@@ -303,7 +325,14 @@ function readVideoTrackInfo() {
     myLog "DEBUG" "CMD: $cmd"
     local height=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
-    heights_a[$stream_counter]=$height
+    re='^[0-9]+$'
+    if ! [[ $height =~ $re ]]
+    then
+        heights_a[$stream_counter]=480
+        myLog "DEBUG" "Height for stream is not defined, using 480"
+    else
+        heights_a[$stream_counter]=$height
+    fi
     myLog "DEBUG" "Track video height: ${heights_a[$stream_counter]}"
 
     # video width
@@ -311,7 +340,15 @@ function readVideoTrackInfo() {
     myLog "DEBUG" "CMD: $cmd"
     local width=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
-    widths_a[$stream_counter]=$width
+    re='^[0-9]+$'
+    if ! [[ $width =~ $re ]]
+    then
+        widths_a[$stream_counter]=854
+        myLog "DEBUG" "Width for stream is not defined, using 854"
+    else
+        widths_a[$stream_counter]=$width
+    fi
+    myLog "DEBUG" "Track video height: ${heights_a[$stream_counter]}"
     myLog "DEBUG" "Track video width: ${widths_a[$stream_counter]}"
 
     # interlaced
@@ -344,7 +381,14 @@ function readAudioTrackInfo() {
     myLog "DEBUG" "CMD: $cmd"
     local channels=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
-    channels_a[$stream_counter]=$channels
+    re='^[0-9]+$'
+    if ! [[ $channels =~ $re ]]
+    then
+        channels_a[$stream_counter]=2
+        myLog "DEBUG" "Width for stream is not defined, using 2"
+    else
+        channels_a[$stream_counter]=$channels
+    fi
     myLog "DEBUG" "Track channels no.: ${channels_a[$stream_counter]}"
 }
 
@@ -483,6 +527,7 @@ declare -a codecs_a
 declare -a languages
 declare -a default_flags_a
 declare -a forced_flags_a
+declare -a bitrates_a
 declare -a titles_a
 declare -a heights_a
 declare -a widths_a
@@ -509,9 +554,6 @@ readArrayFromString "supported_subtitles_codecs_a" $supported_subtitles_codecs
 
 actual_date_str=`date +"%Y-%m-%d"`
 report_file_name="$report_file_location/samtvready-$actual_date_str-report.csv"
-
-# input file is first file in inputs
-fmux_inputs_a+=("'$input_file'")
 
 # title
 cmd="ffprobe -v quiet -show_entries format_tags=title -of csv=s=,:p=0 -i '$input_file'"
@@ -542,6 +584,13 @@ then
 fi
 myLog "TRACE" "Is matroska file: $is_matroska"
 
+is_asf=false
+if [[ $container_type = *"asf"* ]]
+then
+    is_asf=true
+fi
+myLog "TRACE" "Is matroska file: $is_asf"
+
 if [ ! -f "$report_file_name" ]
 then
     cmd="touch $report_file_name"
@@ -554,6 +603,12 @@ myLog "TRACE" "Report file name: " $report_file_name
 if [ "$report_vob_files" = true ] && [[ "$input_file_extension" = *"VOB" ]]
 then
     echo "VOB,$input_dirname,$input_file" >> $report_file_name
+fi
+
+# input file is first file in inputs
+if [ "$is_asf" = false ]
+then
+    fmux_inputs_a+=("'$input_file'")
 fi
 
 # help file names
@@ -594,8 +649,21 @@ stream_counter=$((0))
 input_counter=$((0))
 
 # booleans for valid video file
-at_least_one_video=false
-at_least_one_audio=false
+if [ "$mux_without_video" = true ]
+then
+    # flag that "there is a video stream"
+    at_least_one_video=true
+else
+    at_least_one_video=false
+fi
+
+if [ "$mux_without_audio" = true ]
+then
+    # flag that "there is a audio stream"
+    at_least_one_audio=true
+else
+    at_least_one_audio=false
+fi
 
 # ---------------------------------------------------------------
 
@@ -645,9 +713,17 @@ while read line; do
 
     # is actual codec supported?
     isVideoCodecSupported ${codecs_a[$stream_counter]};videoCodecSupported=$?
-    if [ "$videoCodecSupported" -eq 0 ]
+    if [ "$videoCodecSupported" -eq 0 ] || [ "$is_asf" = true ]
     then
-        myLog "INFO" "NOT supported VIDEO codec. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
+        if [ "$is_asf" = true ]
+        then
+            myLog "INFO" "NOT supported CONTAINER (ASF - Windows format)."
+        fi
+
+        if [ "$videoCodecSupported" -eq 0 ]
+        then
+            myLog "INFO" "NOT supported VIDEO codec. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
+        fi
         
         # read additional info about video
         readVideoTrackInfo
@@ -875,9 +951,17 @@ while read line; do
 
     # is actual codec supported?
     isAudioCodecSupported ${codecs_a[$stream_counter]};audioCodecSupported=$?
-    if [ "$audioCodecSupported" -eq 0 ]
+    if [ "$audioCodecSupported" -eq 0 ] || [ "$is_asf" = true ]
     then
-        myLog "INFO" "NOT supported AUDIO codec. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
+        if [ "$is_asf" = true ]
+        then
+            myLog "INFO" "NOT supported CONTAINER (ASF - Windows format)."
+        fi
+
+        if [ "$audioCodecSupported" -eq 0 ]
+        then
+            myLog "INFO" "NOT supported AUDIO codec. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
+        fi
 
         # read additional info about audio
         readAudioTrackInfo
@@ -931,19 +1015,19 @@ while read line; do
                 # convert if want to convert
                 if [ "$unsupported_audio" = "convert" ]
                 then
-                    # start at highest resolution
+                    # start at highest bitrate
                     unsupported_audio_acodec_params="$unsupported_audio_hq_acodec"
                     
                     myLog "TRACE" "Audio channels: " ${channels_a[$stream_counter]}  
                     
-                    if [ "${channels_a[$stream_counter]}" -gt 6 ]
-                    then
-                        unsupported_audio_acodec_params="$unsupported_audio_hq_acodec"
-                    fi
-
                     if [ "${channels_a[$stream_counter]}" -le 2 ]
                     then
-                        unsupported_audio_acodec_params="$unsupported_audio_lq_acodec"
+                        if [ "${bitrates_a[$stream_counter]}" -le $lq_sq_bitrate_border ]
+                        then
+                            unsupported_audio_acodec_params="$unsupported_audio_lq_acodec"
+                        else
+                            unsupported_audio_acodec_params="$unsupported_audio_sq_acodec"
+                        fi
                     fi
 
                     # convert original stream into supported codec
@@ -1052,9 +1136,17 @@ while read line; do
 
     # is actual codec supported?
     isSubtitlesCodecSupported ${codecs_a[$stream_counter]};subtitlesCodecSupported=$?
-    if [ "$subtitlesCodecSupported" -eq 0 ]
+    if [ "$subtitlesCodecSupported" -eq 0 ] || [ "$is_asf" = true ]
     then
-        myLog "INFO" "NOT supported SUBTITLE codec. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
+        if [ "$is_asf" = true ]
+        then
+            myLog "INFO" "NOT supported CONTAINER (ASF - Windows format)."
+        fi
+
+        if [ "$subtitlesCodecSupported" -eq 0 ]
+        then
+            myLog "INFO" "NOT supported SUBTITLE codec. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
+        fi
         
         # read additional info about audio
         if [ "$unsupported_subtitles" = "report" ]
@@ -1240,7 +1332,7 @@ then
         for fin in "${fmux_inputs_a[@]}"
         do
             myLog "TRACE" "Final mux input: $fin"
-            if [ "$first" = true ]
+            if [ "$first" = true ] && [ "$is_asf" = false ]
             then
                 myLog "TRACE" "Track languages: ${fmux_track_languages_a[$input_counter]}"
                 myLog "TRACE" "Track forced flags: ${fmux_track_forced_flags_a[$input_counter]}"
