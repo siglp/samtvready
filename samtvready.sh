@@ -551,7 +551,7 @@ then
 fi
 myLog "TRACE" "Report file name: " $report_file_name
 
-if [ "$report_vob_files" = true ] && [ "$input_file_extension" = *"VOB" ]
+if [ "$report_vob_files" = true ] && [[ "$input_file_extension" = *"VOB" ]]
 then
     echo "VOB,$input_dirname,$input_file" >> $report_file_name
 fi
@@ -730,7 +730,13 @@ while read line; do
                     myLog "TRACE" "Video interlaced: " ${interlaced_flags_a[$stream_counter]}
                     if [ "${interlaced_flags_a[$stream_counter]}" = true ]
                     then
-                        unsupported_video_vcodec_params="$unsupported_video_480p_params -vf yadif"
+                        if [[ "$unsupported_video_vcodec_params" = *"-vf "* ]]
+                        then
+                            yadif="-vf yadif,"
+                            unsupported_video_vcodec_params=${unsupported_video_vcodec_params/-vf /$yadif}
+                        else
+                            unsupported_video_vcodec_params="$unsupported_video_vcodec_params -vf yadif"
+                        fi
                     fi
 
                     # convert original stream into supported codec
