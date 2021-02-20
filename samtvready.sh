@@ -624,6 +624,7 @@ files_with_temp_data_a+=($streams_output $video_streams_output $audio_streams_ou
 # converted file
 converted_file="$input_file_name$converted_file_name_suffix.mkv"
 converted_srtfile="$input_file_name$converted_file_name_suffix.srt"
+converted_subfile="$input_file_name$converted_file_name_suffix.sub"
 
 # prepare help files
 cmd="ffprobe -v quiet -show_entries stream=index,codec_type -of csv=s=,:p=0 '$input_file' > '$streams_output'"
@@ -1410,6 +1411,7 @@ then
         
         # copy or move original srt
         original_srt_file="$input_file_name.srt"
+        original_sub_file="$input_file_name.sub"
         if [ "$keep_original_file" = false ]
         then
             cmd="rm -rf '$input_dirname/$input_file'"
@@ -1432,6 +1434,18 @@ then
                     myLog "WARNING" "Couldn't rename original srt file."
                 fi
             fi
+
+            if [ -f "$input_dirname/$original_sub_file" ]
+            then
+                cmd="mv '$input_dirname/$original_sub_file' '$input_dirname/$converted_subfile'"
+                myLog "DEBUG" "CMD: $cmd"
+                eval $cmd;result=$?
+                myLog "DEBUG" "CMD RESULT: $result"
+                if [ $result != 0 ]
+                then
+                    myLog "WARNING" "Couldn't rename original sub file."
+                fi
+            fi
         else
             if [ -f "$input_dirname/$original_srt_file" ]
             then
@@ -1444,6 +1458,18 @@ then
                     myLog "WARNING" "Couldn't copy original srt file."
                 fi
             fi
+            
+            if [ -f "$input_dirname/$original_sub_file" ]
+            then
+                cmd="cp '$input_dirname/$original_sub_file' '$input_dirname/$converted_subfile'"
+                myLog "DEBUG" "CMD: $cmd"
+                eval $cmd;result=$?
+                myLog "DEBUG" "CMD RESULT: $result"
+                if [ $result != 0 ]
+                then
+                    myLog "WARNING" "Couldn't copy original sub file."
+                fi
+            fi            
         fi
     else
         myLog "ERROR" "Samsung TV 2018+ conversion wasn't successful. There is NOT at least one audio and one video track."

@@ -35,6 +35,8 @@ This scripts should work also in Windows 10, if you have enabled and installed [
 
 ## Configuration
 Always change configuration in **samtvready.conf**.
+
+### Basic config parameters
 - **converted_file_name_suffix**
     - string suffix for converted file name
     - it is also used for check, if file was already converted
@@ -65,6 +67,8 @@ Always change configuration in **samtvready.conf**.
     - additional params for ffmpeg used as global params (before -i option)
     - **libx** ex:``ffmpeg_input_params="-nostdin -fflags +genpts"``
     - **nvenc** ex:``ffmpeg_input_params="-nostdin -fflags +genpts -hwaccel auto"``
+
+### Video config parameters
 - **supported_video_codecs**
     - comma separated list of video codecs, which are supported => will not be converted
     - ``supported_video_codecs="hevc,h264,av1"``
@@ -103,6 +107,8 @@ Always change configuration in **samtvready.conf**.
 - **mux_without_video**
     - boolean value which indicates, that you want mux final media file even if there is no valid (converted or original) video
     - ``mux_without_video=false``
+
+### Audio config parameters
 - **supported_audio_codecs**
     - comma separated list of audio codecs, which are supported => will not be converted
     - ``supported_audio_codecs="aac,aac_latm,ac3,eac3"``
@@ -130,6 +136,8 @@ Always change configuration in **samtvready.conf**.
 - **mux_without_audio**
     - boolean value which indicates, that you want mux final media file even if there is no valid (converted or original) audio
     - ``mux_without_audio=false``
+
+### Subtitles config parameters
 - **supported_subtitles_codecs=**
     - comma separated list of subtitle formats, which are supported => will not be converted
     - ``supported_subtitles_codecs="subrip,srt,ass,ssa,dvd_subtitle"``
@@ -144,6 +152,8 @@ Always change configuration in **samtvready.conf**.
 - **unsupported_subtitles_conversion_params**
     - params for ffmpeg conversion used for subtitles (*NOT IMPLEMENTED*)
     - ``unsupported_subtitles_conversion_params=""``
+
+### Keep original streams and videos. temp files
 - **keep_original_file**
     - boolean value which indicates if you want to keep original file (recommendation **true**)
     - ``keep_original_file=true``
@@ -158,6 +168,8 @@ Always change configuration in **samtvready.conf**.
 - **clean_temp_files**
     - boolean value which indicates if you want to delete work / temp files
     - ``clean_temp_files=true``
+
+### Logging
 - **loglevel**
     - string value which defines logging level
     - **TRACE** - very detailed information
