@@ -55,7 +55,7 @@ then
     echo "Samsung TV 2018+ BATCH conversion / check finished."
 else
     echo "Samsung TV 2018+ BATCH conversion / check finished with ERRORS for some inputs. See below:"
-    echo ${errors[*]}
+    printf '%s\n' "${errors[@]}"
 fi
 
 exit 0
