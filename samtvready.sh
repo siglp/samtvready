@@ -1,4 +1,4 @@
-#!/bin/bash
+\#!/bin/bash
 # Author: Petr27
 
 # ---------------------------------------------------------------
@@ -591,7 +591,7 @@ if [[ $container_type = *"asf"* ]]
 then
     is_asf=true
 fi
-myLog "TRACE" "Is matroska file: $is_asf"
+myLog "TRACE" "Is asf (ASF - Windows format) file: $is_asf"
 
 if [ ! -f "$report_file_name" ]
 then
