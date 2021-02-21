@@ -138,7 +138,7 @@ Always change configuration in **samtvready.conf**.
     - ``mux_without_audio=false``
 
 ### Subtitles config parameters
-- **supported_subtitles_codecs=**
+- **supported_subtitles_codecs**
     - comma separated list of subtitle formats, which are supported => will not be converted
     - ``supported_subtitles_codecs="subrip,srt,ass,ssa,dvd_subtitle"``
 - **unsupported_subtitles**
