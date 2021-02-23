@@ -10,6 +10,7 @@ In fact you can configure it to convert "every type" to "some another type" (def
 This scripts should work also in Windows 10, if you have enabled and installed [WSL](https://ubuntu.com/wsl).
 
 ## Prerequisites
+- **bash 4.4+**
 - **ffmpeg** installed
     - **ffprobe** used for getting detailed info about streams
     - **ffmpeg** used for extracting streams (as backup solution if mkvextract is not working)
@@ -24,12 +25,14 @@ This scripts should work also in Windows 10, if you have enabled and installed [
     - **samtvready.sh**
     - **samtvready.conf**
     - **samtvready-batch.sh**
+    - **samtvready-find.sh**
     - **language-codes.csv**
 3. If you choose some another location, you must change it also in **samtvready.sh** (for including config file)
     - ``config_file="/opt/samtvready/samtvready.conf"``
 4. Make a symbolic link in **/usr/local/sbin** to **samtvready.sh** and **samtvready-batch.sh**
     - ``sudo ln -s /opt/samtvready/samtvready.sh /usr/local/sbin/samtvready``
     - ``sudo ln -s /opt/samtvready/samtvready-batch.sh /usr/local/sbin/samtvready-batch``
+    - ``sudo ln -s /opt/samtvready/samtvready-find.sh /usr/local/sbin/samtvready-find``
 5. Edit **samtvready.conf** for your own usage
 6. Copy **language-codes.csv** to the same location as **samtvready.conf**
 
@@ -195,11 +198,13 @@ Always change configuration in **samtvready.conf**.
     -   ``samtvready-batch /data/movies/file_list.txt check_only``
 - Batch file conversion:
     -   ``samtvready-batch /data/movies/file_list.txt``
+- Find files for convert in actual dir and subdirs:
+    -   ``samtvready-find my_files.txt``
     
 Batch conversion needs list of full path filenames to convert / check. See file_list_sample.txt.
-You can generate this file with find or create it manually or what ever you want.
+You can generate this file with **samtvready-find**, classic **find** command, create it manually or what ever you want.
 
-Example: ``find ~+ ! \( -name "*-SamTVReady*" -o -name "*movie-poster*" -o -name "*original-stream-*" -o -name "*.srt" \) -type f > movies.txt``
+Example for find command: ``find ~+ ! \( -name "*-SamTVReady*" -o -name "*movie-poster*" -o -name "*original-stream-*" -o -name "*.srt" \) -type f > movies.txt``
 
 You can also create cron for periodically check and so on...
 
