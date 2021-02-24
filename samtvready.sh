@@ -233,9 +233,14 @@ function val_trim() {
 }
 
 function readArrayFromString() {
-    readarray -c1 -C 'mfcb val_trim "$1"' -td, <<<"$2,"
-    eval `echo "unset '$1[-1]'"`
-    declare -a $1
+    readarray -c1 -C 'mfcb val_trim "$1"' -td, <<<"$2,";result=$?
+    if [ "result" != 0 ]
+    then
+        IFS=', ' read -r -a $1 <<< "$2"
+    else
+        eval `echo "unset '$1[-1]'"`
+        declare -a $1
+    fi
 }
 
 # read common information about track
@@ -550,8 +555,11 @@ declare -a files_with_original_streams_a
 declare -a files_with_temp_data_a
 
 readArrayFromString "supported_video_codecs_a" $supported_video_codecs 
+myLog "TRACE" "Supported video codecs array:" ${supported_video_codecs_a[@]}
 readArrayFromString "supported_audio_codecs_a" $supported_audio_codecs
+myLog "TRACE" "Supported audio codecs array:" ${supported_audio_codecs_a[@]}
 readArrayFromString "supported_subtitles_codecs_a" $supported_subtitles_codecs
+myLog "TRACE" "Supported subtitles codecs array:" ${supported_subtitles_codecs_a[@]}
 
 actual_date_str=`date +"%Y-%m-%d"`
 report_file_name="$report_file_location/samtvready-$actual_date_str-report.csv"
