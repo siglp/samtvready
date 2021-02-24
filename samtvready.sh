@@ -47,6 +47,8 @@ report_file_location="/opt/samtvready/report"
 #working_dir_location="/opt/samtvready/work"
 # empty - work in file directory
 working_dir_location=""
+# if file size is bellow this value in bytes, working dir will NOT be ever used
+min_file_size_for_using_working_dir=10000000000
 # if file size is above this value in bytes, working dir will NOT be ever used
 max_file_size_for_using_working_dir=100000000000
 
@@ -451,11 +453,11 @@ myLog "HIGHEST" "Samsung TV 2018+ conversion / check started..."
 useWorkingDirectory=false
 if [ -d "$working_dir_location" ] 
 then
-    if [ $input_file_size -le $max_file_size_for_using_working_dir ]
+    if [ $input_file_size -ge $min_file_size_for_using_working_dir ] && [ $input_file_size -le $max_file_size_for_using_working_dir ] 
     then
         useWorkingDirectory=true
     else
-        myLog "WARNING" "File is too big for using working directory. It will be converted in original destination."
+        myLog "WARNING" "File is too big or too small for using working directory. It will be converted in original destination."
         useWorkingDirectory=false
     fi
 fi

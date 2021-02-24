@@ -57,6 +57,10 @@ Always change configuration in **samtvready.conf**.
     - if this setting is empty, then script will work in original file destination
     - must **NOT** end with **"/"**
     - ``working_dir_location=""``
+- **min_file_size_for_using_working_dir**
+    - minimal file size in bytes which should be copy to working location
+    - if file size is bellow this value, then script will work in original file destination
+    - ``min_file_size_for_using_working_dir=10000000000``
 - **max_file_size_for_using_working_dir**
     - maximal file size in bytes which should be copy to working location
     - if file size is above this value, then script will work in original file destination
