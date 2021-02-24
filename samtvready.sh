@@ -236,7 +236,9 @@ function readArrayFromString() {
     readarray -c1 -C 'mfcb val_trim "$1"' -td, <<<"$2,";result=$?
     if [ "result" != 0 ]
     then
+        backupIFS=$IFS
         IFS=', ' read -r -a $1 <<< "$2"
+        IFS=$backupIFS
     else
         eval `echo "unset '$1[-1]'"`
         declare -a $1
