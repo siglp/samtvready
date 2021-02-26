@@ -172,6 +172,13 @@ Always change configuration in **samtvready.conf**.
     - if it is relative than "base" is original file direcotry
     - must **NOT** end with **"/"**
     - ``original_streams_dir="0-original-streams"``
+- **add_nomedia_file**
+    - if true then add **nomedia_file_name** file into **original_streams_dir**
+    -``add_nomedia_file=true``
+- **nomedia_file_name**
+    - name for empty nomedia file
+    - this file is used by some DLNA servers and means that in directory are no media
+    - ``nomedia_file_name=".nomedia"``
 - **clean_temp_files**
     - boolean value which indicates if you want to delete work / temp files
     - ``clean_temp_files=true``

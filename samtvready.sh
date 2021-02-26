@@ -113,6 +113,10 @@ keep_original_file=true
 save_original_streams=true
 original_streams_dir="0-original-streams"
 
+# add .nomedia in original streams dir
+add_nomedia_file=true
+nomedia_file_name=".nomedia"
+
 # clean temp files (delete help files)
 clean_temp_files=true
 
@@ -1499,6 +1503,18 @@ then
         if [ $result != 0 ]
         then
             myLog "WARNING" "Couldn't create directory for original streams."
+        else
+            # add nomedia file (supported in some dlna servers)
+            if [ "$add_nomedia_file" = true ]
+                cmd="touch '$input_dirname/$nomedia_file_name'"
+                myLog "DEBUG" "CMD: $cmd"
+                eval $cmd;result=$?
+                if [ $result != 0 ]
+                then
+                    myLog "WARNING" "Couldn't create nomedia file in original streams dir."
+                fi                
+            then
+            fi
         fi
 
         for osfn in "${files_with_original_streams_a[@]}"
