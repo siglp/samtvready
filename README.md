@@ -205,10 +205,14 @@ Always change configuration in **samtvready.conf**.
     -   ``samtvready /data/movies/MyMovie.avi check_only``
 - Single file conversion:
     -   ``samtvready /data/movies/MyMovie.avi``
+- Single file conversion with own config:
+    -   ``samtvready /data/movies/MyMovie.avi /data/my-samtvready.conf``
 - Batch file check:
     -   ``samtvready-batch /data/movies/file_list.txt check_only``
 - Batch file conversion:
     -   ``samtvready-batch /data/movies/file_list.txt``
+- Batch file conversion:
+    -   ``samtvready-batch /data/movies/file_list.txt /data/my-samtvready.conf``
 - Find files for convert in actual dir and subdirs:
     -   ``samtvready-find my_files.txt``
     

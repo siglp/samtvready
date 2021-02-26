@@ -21,11 +21,28 @@ then
     exit -1
 fi
 
-if [ -z "$2" ]
+if [ ! -z "$2" ]
+then
+    if [ "$2" = "check_only" ]
+    then
+        check_only=true
+    else
+        if [ ! -f "$2" ]
+        then
+            echo "Not existing file for config:" $2 ". Using default path: " $config_file
+        else
+            config_file=$2        
+        fi
+    fi
+else
+    check_only=false
+fi
+
+if [ -z "$3" ]
 then
     check_only=false
 else
-    if [ "$2" = "check_only" ]
+    if [ "$3" = "check_only" ]
     then
         check_only=true
     else

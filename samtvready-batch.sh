@@ -16,9 +16,8 @@ then
     echo "Not existing file list for check / convert: " $input_file_arg
     exit -1
 fi
-
-check_only=$2
 input_file=$input_file_arg
+
 
 # ---------------------------------------------------------------
 
@@ -34,7 +33,7 @@ while read line; do
 
     echo "--------------------------- Start: $line ---------------------------" 
 
-    cmd="samtvready '$line' $check_only"
+    cmd="samtvready '$line' ${*:2}"
     eval $cmd;result=$?
     
     if [ $result != 0 ]
