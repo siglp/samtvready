@@ -781,13 +781,13 @@ while read line; do
                 myLog "DEBUG" "CMD RESULT: $result"
                 if [ $result = 0 ]
                 then
-                    files_with_original_streams_a+=($original_stream_file_name)
+                    files_with_original_streams_a+=("$original_stream_file_name")
                 else
                     myLog "ERROR" "Extracting not successful. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
                     can_convert=false
                 fi
             else
-                files_with_original_streams_a+=($original_stream_file_name)
+                files_with_original_streams_a+=("$original_stream_file_name")
             fi
 
             # convert only default and only if there is something to convert
@@ -842,7 +842,7 @@ while read line; do
                     myLog "DEBUG" "CMD RESULT: $result"
                     if [ $result = 0 ]
                     then
-                        files_with_temp_data_a+=($original_stream_file_name_converted)
+                        files_with_temp_data_a+=("$original_stream_file_name_converted")
                         # prepare for final output
                         input_counter=$(($input_counter + 1))
                         myLog "TRACE" "Input counter: $input_counter"
@@ -883,14 +883,14 @@ while read line; do
             original_stream_file_name_idx="$original_stream_name.idx"
             if [ -f "$original_stream_file_name_idx" ]
             then
-                files_with_original_streams_a+=($original_stream_file_name_idx)
+                files_with_original_streams_a+=("$original_stream_file_name_idx")
             fi
 
             # ffmpeg can generate IDX and SUB files
             original_stream_file_name_sub="$original_stream_name.sub"
             if [ -f "$original_stream_file_name_sub" ]
             then
-                files_with_original_streams_a+=($original_stream_file_name_sub)
+                files_with_original_streams_a+=("$original_stream_file_name_sub")
             fi
             
         fi
@@ -1019,13 +1019,13 @@ while read line; do
                 myLog "DEBUG" "CMD RESULT: $result"
                 if [ $result = 0 ]
                 then
-                    files_with_original_streams_a+=($original_stream_file_name)
+                    files_with_original_streams_a+=("$original_stream_file_name")
                 else
                     myLog "ERROR" "Extracting not successful. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
                     can_convert=false
                 fi
             else
-                files_with_original_streams_a+=($original_stream_file_name)
+                files_with_original_streams_a+=("$original_stream_file_name")
             fi
 
             # convert only if there is something to convert
@@ -1057,7 +1057,7 @@ while read line; do
                     myLog "DEBUG" "CMD RESULT: $result"
                     if [ $result = 0 ]
                     then
-                        files_with_temp_data_a+=($original_stream_file_name_converted)
+                        files_with_temp_data_a+=("$original_stream_file_name_converted")
                         # prepare for final output
                         input_counter=$(($input_counter + 1))
                         myLog "TRACE" "Input counter: $input_counter"
@@ -1098,14 +1098,14 @@ while read line; do
             original_stream_file_name_idx="$original_stream_name.idx"
             if [ -f "$original_stream_file_name_idx" ]
             then
-                files_with_original_streams_a+=($original_stream_file_name_idx)
+                files_with_original_streams_a+=("$original_stream_file_name_idx")
             fi
 
             # ffmpeg can generate IDX and SUB files
             original_stream_file_name_sub="$original_stream_name.sub"
             if [ -f "$original_stream_file_name_sub" ]
             then
-                files_with_original_streams_a+=($original_stream_file_name_sub)
+                files_with_original_streams_a+=("$original_stream_file_name_sub")
             fi
 
         fi
@@ -1203,13 +1203,13 @@ while read line; do
                 myLog "DEBUG" "CMD RESULT: $result"
                 if [ $result = 0 ]
                 then
-                    files_with_original_streams_a+=($original_stream_file_name)
+                    files_with_original_streams_a+=("$original_stream_file_name")
                 else
                     myLog "ERROR" "Extracting not successful. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
                     can_convert=false
                 fi
             else
-                files_with_original_streams_a+=($original_stream_file_name)
+                files_with_original_streams_a+=("$original_stream_file_name")
             fi
 
             if [ "$can_convert" = true ]
@@ -1227,14 +1227,14 @@ while read line; do
             original_stream_file_name_idx="$original_stream_name.idx"
             if [ -f "$original_stream_file_name_idx" ]
             then
-                files_with_original_streams_a+=($original_stream_file_name_idx)
+                files_with_original_streams_a+=("$original_stream_file_name_idx")
             fi
 
             # ffmpeg can generate IDX and SUB files
             original_stream_file_name_sub="$original_stream_name.sub"
             if [ -f "$original_stream_file_name_sub" ]
             then
-                files_with_original_streams_a+=($original_stream_file_name_sub)
+                files_with_original_streams_a+=("$original_stream_file_name_sub")
             fi
 
         fi
@@ -1507,7 +1507,7 @@ then
             # add nomedia file (supported in some dlna servers)
             if [ "$add_nomedia_file" = true ]
             then
-                cmd="touch '$input_dirname/$nomedia_file_name'"
+                cmd="touch '$input_dirname/$original_streams_dir/$nomedia_file_name'"
                 myLog "DEBUG" "CMD: $cmd"
                 eval $cmd;result=$?
                 if [ $result != 0 ]
@@ -1519,7 +1519,6 @@ then
 
         for osfn in "${files_with_original_streams_a[@]}"
         do
-
             cmd="mv '$osfn' '$input_dirname/$original_streams_dir'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
@@ -1528,12 +1527,10 @@ then
             then
                 myLog "WARNING" "Couldn't move original stream. '$osfn'"
             fi
-
         done
     else
         for osfn in "${files_with_original_streams_a[@]}"
         do
-
             cmd="rm -rf '$osfn'"
             myLog "DEBUG" "CMD: $cmd"
             eval $cmd;result=$?
@@ -1542,7 +1539,6 @@ then
             then
                 myLog "WARNING" "Couldn't delete original stream file."
             fi
-
         done
     fi
 
