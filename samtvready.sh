@@ -1506,6 +1506,7 @@ then
         else
             # add nomedia file (supported in some dlna servers)
             if [ "$add_nomedia_file" = true ]
+            then
                 cmd="touch '$input_dirname/$nomedia_file_name'"
                 myLog "DEBUG" "CMD: $cmd"
                 eval $cmd;result=$?
@@ -1513,7 +1514,6 @@ then
                 then
                     myLog "WARNING" "Couldn't create nomedia file in original streams dir."
                 fi                
-            then
             fi
         fi
 
