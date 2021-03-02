@@ -211,7 +211,7 @@ Always change configuration in **samtvready.conf**.
     -   ``samtvready-batch /data/movies/file_list.txt check_only``
 - Batch file conversion:
     -   ``samtvready-batch /data/movies/file_list.txt``
-- Batch file conversion:
+- Batch file conversion with own config:
     -   ``samtvready-batch /data/movies/file_list.txt /data/my-samtvready.conf``
 - Find files for convert in actual dir and subdirs:
     -   ``samtvready-find my_files.txt``
