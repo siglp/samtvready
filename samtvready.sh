@@ -915,10 +915,14 @@ while read line; do
                         fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[$input_counter]}"--track-name '0:${titles_a[$stream_counter]}' "
                         myLog "TRACE" "Titles after: " ${fmux_track_titles_a[$input_counter]}
                         
-                        myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[$input_counter]}
-                        fmux_track_syncs_a[$input_counter]=${fmux_track_syncs_a[$input_counter]}"--sync '0:${delays_a[$stream_counter]}' "
-                        myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[$input_counter]}
-                        
+                        # sync only for converted tracks and with delay > 0
+                        if [ ${delays_a[$stream_counter]} -gt 0 ]
+                        then
+                            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[$input_counter]}
+                            fmux_track_syncs_a[$input_counter]=${fmux_track_syncs_a[$input_counter]}"--sync '0:${delays_a[$stream_counter]}' "
+                            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[$input_counter]}
+                        fi
+                                                
                         at_least_one_video=true
                     else
                         myLog "ERROR" "Conversion not successful. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
@@ -965,10 +969,6 @@ while read line; do
             fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
 
-            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[0]}
-            fmux_track_syncs_a[0]=${fmux_track_syncs_a[0]}"--sync '${indexes_a[$stream_counter]}:${delays_a[$stream_counter]}' "
-            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[0]}
-            
             at_least_one_video=true
         fi
     fi
@@ -1138,9 +1138,13 @@ while read line; do
                         fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[$input_counter]}"--track-name '0:${titles_a[$stream_counter]}' "
                         myLog "TRACE" "Titles after: " ${fmux_track_titles_a[$input_counter]}
 
-                        myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[$input_counter]}
-                        fmux_track_syncs_a[$input_counter]=${fmux_track_syncs_a[$input_counter]}"--sync '0:${delays_a[$stream_counter]}' "
-                        myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[$input_counter]}
+                        # sync only for converted tracks and with delay > 0
+                        if [ ${delays_a[$stream_counter]} -gt 0 ]
+                        then
+                            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[$input_counter]}
+                            fmux_track_syncs_a[$input_counter]=${fmux_track_syncs_a[$input_counter]}"--sync '0:${delays_a[$stream_counter]}' "
+                            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[$input_counter]}
+                        fi
                         
                         at_least_one_audio=true
                     else
@@ -1188,10 +1192,6 @@ while read line; do
             fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
 
-            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[0]}
-            fmux_track_syncs_a[0]=${fmux_track_syncs_a[0]}"--sync '${indexes_a[$stream_counter]}:${delays_a[$stream_counter]}' "
-            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[0]}
-            
             at_least_one_audio=true
         fi
     fi
@@ -1320,10 +1320,6 @@ while read line; do
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
             fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
-
-            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[0]}
-            fmux_track_syncs_a[0]=${fmux_track_syncs_a[0]}"--sync '${indexes_a[$stream_counter]}:${delays_a[$stream_counter]}' "
-            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[0]}
         fi
     fi
 
