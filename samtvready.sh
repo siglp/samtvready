@@ -107,11 +107,11 @@ supported_audio_codecs="aac,aac_latm,ac3,eac3"
 # constants - configuration "remove" / "convert" / "copy" (default if nothing or bad value) / "report"
 unsupported_audio="convert"
 # conversion params for ffmpeg
-unsupported_audio_lq_acodec="-acodec aac -b:a 192k"
-unsupported_audio_sq_acodec="-acodec aac -b:a 448k"
+unsupported_audio_lq_acodec="-acodec aac -b:a 256k"
+unsupported_audio_sq_acodec="-acodec eac3 -b:a 768k"
 unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k -ac 6"
 # border for lq vs sq in bit/s
-lq_sq_bitrate_border=192000
+lq_sq_bitrate_border=256000
 # mux without audio
 mux_without_audio=false
 
@@ -346,6 +346,22 @@ function readCommonTrackInfo() {
         bitrates_a[$stream_counter]=$bitrate
     fi
     myLog "DEBUG" "Track bitrate: ${bitrates_a[$stream_counter]}"
+    
+    # delay
+    cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=start_pts -of csv=s=,:p=0 '$input_file'"
+    myLog "DEBUG" "CMD: $cmd"
+    local delay=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    myLog "DEBUG" "CMD RESULT: $result"
+    re='^[0-9]+$'
+    if ! [[ $delay =~ $re ]] 
+    then
+        delays_a[$stream_counter]=0
+        myLog "DEBUG" "Delay for stream is not defined, using 0."
+    else
+        delays_a[$stream_counter]=$delay
+    fi
+    myLog "DEBUG" "Track delay: ${delays_a[$stream_counter]}"
+    
 }
 
 # read video information about track
@@ -565,6 +581,7 @@ declare -a widths_a
 declare -a interlaced_flags_a
 declare -a pixel_formats_a
 declare -a channels_a
+declare -a delays_a
 
 declare -a fmux_inputs_a
 declare -a fmux_tracks_a
@@ -572,6 +589,7 @@ declare -a fmux_track_languages_a
 declare -a fmux_track_forced_flags_a
 declare -a fmux_track_default_flags_a
 declare -a fmux_track_titles_a
+declare -a fmux_track_syncs_a
 declare -a fmux_not_copy_videos_a
 declare -a fmux_not_copy_audios_a
 declare -a fmux_not_copy_subtitles_a
@@ -658,6 +676,14 @@ files_with_temp_data_a+=($streams_output $video_streams_output $audio_streams_ou
 converted_file="$input_file_name$converted_file_name_suffix.mkv"
 converted_srtfile="$input_file_name$converted_file_name_suffix.srt"
 converted_subfile="$input_file_name$converted_file_name_suffix.sub"
+
+# prepare original stream info file
+original_stream_info_file_name="$input_file_name-original-stream-info.txt" 
+myLog "DEBUG" "CMD: $cmd"
+cmd="ffprobe -show_streams -show_format -show_chapters '$input_file' > '$original_stream_info_file_name' 2>&1"
+eval $cmd;result=$?
+myLog "DEBUG" "CMD RESULT: $result"
+files_with_original_streams_a+=("$original_stream_info_file_name")
 
 # prepare help files
 cmd="ffprobe -v quiet -show_entries stream=index,codec_type -of csv=s=,:p=0 '$input_file' > '$streams_output'"
@@ -889,6 +915,10 @@ while read line; do
                         fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[$input_counter]}"--track-name '0:${titles_a[$stream_counter]}' "
                         myLog "TRACE" "Titles after: " ${fmux_track_titles_a[$input_counter]}
                         
+                        myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[$input_counter]}
+                        fmux_track_syncs_a[$input_counter]=${fmux_track_syncs_a[$input_counter]}"--sync '0:${delays_a[$stream_counter]}' "
+                        myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[$input_counter]}
+                        
                         at_least_one_video=true
                     else
                         myLog "ERROR" "Conversion not successful. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]}."
@@ -934,6 +964,10 @@ while read line; do
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
             fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
+
+            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[0]}
+            fmux_track_syncs_a[0]=${fmux_track_syncs_a[0]}"--sync '${indexes_a[$stream_counter]}:${delays_a[$stream_counter]}' "
+            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[0]}
             
             at_least_one_video=true
         fi
@@ -959,7 +993,7 @@ while read line; do
     
     if [ "${default_flags_a[$stream_counter]}" = true ]
     then
-        exists_default_video_track=true
+        exists_default_audio_track=true
     fi 
 
     # append +1 to stream counter
@@ -1103,6 +1137,10 @@ while read line; do
                         myLog "TRACE" "Titles before: " ${fmux_track_titles_a[$input_counter]}
                         fmux_track_titles_a[$input_counter]=${fmux_track_titles_a[$input_counter]}"--track-name '0:${titles_a[$stream_counter]}' "
                         myLog "TRACE" "Titles after: " ${fmux_track_titles_a[$input_counter]}
+
+                        myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[$input_counter]}
+                        fmux_track_syncs_a[$input_counter]=${fmux_track_syncs_a[$input_counter]}"--sync '0:${delays_a[$stream_counter]}' "
+                        myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[$input_counter]}
                         
                         at_least_one_audio=true
                     else
@@ -1149,6 +1187,10 @@ while read line; do
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
             fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
+
+            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[0]}
+            fmux_track_syncs_a[0]=${fmux_track_syncs_a[0]}"--sync '${indexes_a[$stream_counter]}:${delays_a[$stream_counter]}' "
+            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[0]}
             
             at_least_one_audio=true
         fi
@@ -1235,7 +1277,7 @@ while read line; do
                 then
                     # convert original stream into supported codec
                     # TODO: convert
-                    myLog "INFO" "Converting NOT supported SUBTITLES. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]} ... ... ..."
+                    myLog "INFO" "Converting NOT supported SUBTITLES. Stream: ${indexes_a[$stream_counter]}, Codec: ${codecs_a[$stream_counter]} Delay: ${delays_a[$stream_counter]} ... ... ..."
                     myLog "ERROR" "Subtitles conversion is NOT implemented. Subtitles wil be removed!!!!"
                 fi
             fi
@@ -1278,6 +1320,10 @@ while read line; do
             myLog "TRACE" "Titles before: " ${fmux_track_titles_a[0]}
             fmux_track_titles_a[0]=${fmux_track_titles_a[0]}"--track-name '${indexes_a[$stream_counter]}:${titles_a[$stream_counter]}' "
             myLog "TRACE" "Titles after: " ${fmux_track_titles_a[0]}
+
+            myLog "TRACE" "Syncs before: " ${fmux_track_syncs_a[0]}
+            fmux_track_syncs_a[0]=${fmux_track_syncs_a[0]}"--sync '${indexes_a[$stream_counter]}:${delays_a[$stream_counter]}' "
+            myLog "TRACE" "Syncs after: " ${fmux_track_syncs_a[0]}
         fi
     fi
 
@@ -1376,14 +1422,16 @@ then
                 myLog "TRACE" "Track forced flags: ${fmux_track_forced_flags_a[$input_counter]}"
                 myLog "TRACE" "Track default flags: ${fmux_track_default_flags_a[$input_counter]}"
                 myLog "TRACE" "Track titles: ${fmux_track_titles_a[$input_counter]}"
-                fmux_inputs_mkvmerge_param+=" $fmux_not_copy_videos_mkvmerge_param $fmux_not_copy_audios_mkvmerge_param $fmux_not_copy_subtitles_mkvmerge_param ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} $fin"
+                myLog "TRACE" "Track sync: ${fmux_track_syncs_a[$input_counter]}"
+                fmux_inputs_mkvmerge_param+=" $fmux_not_copy_videos_mkvmerge_param $fmux_not_copy_audios_mkvmerge_param $fmux_not_copy_subtitles_mkvmerge_param ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} ${fmux_track_syncs_a[$input_counter]} $fin"
                 first=false
             else
                 myLog "TRACE" "Track languages: ${fmux_track_languages_a[$input_counter]}"
                 myLog "TRACE" "Track forced flags: ${fmux_track_forced_flags_a[$input_counter]}"
                 myLog "TRACE" "Track default flags: ${fmux_track_default_flags_a[$input_counter]}"
                 myLog "TRACE" "Track titles: ${fmux_track_titles_a[$input_counter]}"
-                fmux_inputs_mkvmerge_param+=" ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} $fin"
+                myLog "TRACE" "Track sync: ${fmux_track_syncs_a[$input_counter]}"
+                fmux_inputs_mkvmerge_param+=" ${fmux_track_languages_a[$input_counter]} ${fmux_track_forced_flags_a[$input_counter]} ${fmux_track_default_flags_a[$input_counter]} ${fmux_track_titles_a[$input_counter]} ${fmux_track_syncs_a[$input_counter]} $fin"
             fi
             input_counter=$(($input_counter + 1))
         done

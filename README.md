@@ -128,18 +128,18 @@ Always change configuration in **samtvready.conf**.
     - **report** - report unsupported stream into report file and do any conversion
     - ``unsupported_audio="convert"``
 - **unsupported_audio_lq_acodec**
-    - params for ffmpeg conversion used for audio streams with lq (low quality) sound (no. of channels less then 5.1, bitrate below **lq_sq_bitrate_border**)
-    - ``unsupported_audio_lq_acodec="-acodec aac -b:a 192k"``
+    - params for ffmpeg conversion used for audio streams with lq (low quality) sound (no. of channels less or equal 2.0, bitrate below **lq_sq_bitrate_border**)
+    - ``unsupported_audio_lq_acodec="-acodec aac -b:a 256k"``
 - **unsupported_audio_sq_acodec**
-    - params for ffmpeg conversion used for audio streams with sq (standard quality) sound (no. of channels less then 5.1, bitrate above **lq_sq_bitrate_border**)
-    - ``unsupported_audio_sq_acodec="-acodec aac -b:a 448k"``
+    - params for ffmpeg conversion used for audio streams with sq (standard quality) sound (no. of channels less or equal 2.0, bitrate above **lq_sq_bitrate_border**)
+    - ``unsupported_audio_sq_acodec="-acodec eac3 -b:a 768k"``
 - **unsupported_audio_hq_acodec**
-    - params for ffmpeg conversion used for audio streams with hq (high quality) sound (no. of channels more or equal 5.1)
+    - params for ffmpeg conversion used for audio streams with hq (high quality) sound (no. of channels more than 2.0)
     - ``unsupported_audio_hq_acodec="-acodec eac3 -b:a 1536k -ac 6"``
 - **lq_sq_bitrate_border**
     - border for lq (low quality) and sq (standard quality)
     - sound with 2 (or less) channels and bitrate below this border will be lq, above this border will be sq
-    - ``lq_sq_bitrate_border=192000``
+    - ``lq_sq_bitrate_border=256000``
 - **mux_without_audio**
     - boolean value which indicates, that you want mux final media file even if there is no valid (converted or original) audio
     - ``mux_without_audio=false``
