@@ -118,7 +118,7 @@ Always change configuration in **samtvready.conf**.
 ### Audio config parameters
 - **supported_audio_codecs**
     - comma separated list of audio codecs, which are supported => will not be converted
-    - ``supported_audio_codecs="aac,aac_latm,ac3,eac3"``
+    - ``supported_audio_codecs="aac,aac_latm,ac3,eac3,mp3"``
 - **unsupported_audio**
     - mode/action for unsupported audio
     - **remove** - remove stream from final file
