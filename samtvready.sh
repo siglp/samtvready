@@ -103,7 +103,7 @@ mux_without_video=false
 
 # --- AUDIO ---
 # audio codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
-supported_audio_codecs="aac,aac_latm,ac3,eac3"
+supported_audio_codecs="aac,aac_latm,ac3,eac3,mp3"
 # constants - configuration "remove" / "convert" / "copy" (default if nothing or bad value) / "report"
 unsupported_audio="convert"
 # conversion params for ffmpeg
