@@ -118,6 +118,10 @@ mux_without_audio=false
 # --- SUBTITLE ---
 # subtitle codecs, that we "want support" - can be more (for more details use: ffmpeg -codecs)
 supported_subtitles_codecs="subrip,srt,ass,ssa,dvd_subtitle"
+# subtitle language (all = include all languages or cze,svk,eng) 
+supported_subtitles_languages=all
+# subtitle track order (order of tracks with subtitles cze,svk,eng)
+supported_subtitles_order=
 # constants - configuration "remove" / "convert" / "copy" (default if nothing or bad value) / "report"
 unsupported_subtitles="remove"
 # conversion params for ffmpeg
@@ -144,6 +148,8 @@ loglevel="TRACE"
 logstyle="DEVEL"
 
 . $config_file
+
+# ---------------------------------------------------------------
 
 basename=$(basename -- "$input_file_arg")
 input_file_extension="${basename##*.}"
@@ -439,6 +445,7 @@ function readAudioTrackInfo() {
     myLog "DEBUG" "Track channels no.: ${channels_a[$stream_counter]}"
 }
 
+# other functions
 
 # is given codec supported
 function isVideoCodecSupported() {
@@ -472,6 +479,25 @@ function isAudioCodecSupported() {
 function isSubtitlesCodecSupported() {
 
     for spc in "${supported_subtitles_codecs_a[@]}"
+    do
+        if [[ "$spc" = *"$1"* ]]
+        then
+            return 1
+        fi
+    done
+ 
+    return 0
+}
+
+# is given subtitle language supported
+function isSubtitlesLanguageSupported() {
+    
+    if [ "$supported_subtitles_languages" = "all" ]
+    then
+        return 1
+    fi
+
+    for spc in "${supported_subtitles_languages_a[@]}"
     do
         if [[ "$spc" = *"$1"* ]]
         then
@@ -603,6 +629,10 @@ readArrayFromString "supported_audio_codecs_a" $supported_audio_codecs
 myLog "TRACE" "Supported audio codecs array:" ${supported_audio_codecs_a[@]}
 readArrayFromString "supported_subtitles_codecs_a" $supported_subtitles_codecs
 myLog "TRACE" "Supported subtitles codecs array:" ${supported_subtitles_codecs_a[@]}
+readArrayFromString "supported_subtitles_languages_a" $supported_subtitles_languages
+myLog "TRACE" "Supported subtitles languages array:" ${supported_subtitles_languages_a[@]}
+readArrayFromString "supported_subtitles_order_a" $supported_subtitles_order
+myLog "TRACE" "Supported subtitles languages order array:" ${supported_subtitles_order_a[@]}
 
 actual_date_str=`date +"%Y-%m-%d"`
 report_file_name="$report_file_location/samtvready-$actual_date_str-report.csv"
@@ -1214,7 +1244,11 @@ while read line; do
 
     # is actual codec supported?
     isSubtitlesCodecSupported ${codecs_a[$stream_counter]};subtitlesCodecSupported=$?
-    if [ "$subtitlesCodecSupported" -eq 0 ] || [ "$is_asf" = true ]
+    myLog "TRACE" "Is subtitles codec supported: " $subtitlesCodecSupported 
+    # is actual language supported?
+    isSubtitlesLanguageSupported ${languages_a[$stream_counter]};subtitlesLanguageSupported=$?
+    myLog "TRACE" "Is subtitles language supported: " $subtitlesLanguageSupported
+    if [ "$subtitlesCodecSupported" -eq 0 ] || [ "$subtitlesLanguageSupported" -eq 0 ] || [ "$is_asf" = true ]
     then
         if [ "$is_asf" = true ]
         then

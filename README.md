@@ -148,6 +148,16 @@ Always change configuration in **samtvready.conf**.
 - **supported_subtitles_codecs**
     - comma separated list of subtitle formats, which are supported => will not be converted
     - ``supported_subtitles_codecs="subrip,srt,ass,ssa,dvd_subtitle"``
+- **supported_subtitle_languages**
+    - comma separated list of subtitle languages, which are supported => will not be removed
+    - **all** - means, that all languages are supported (include undefined "und")
+    - values must be ISO codes - **"eng, cze, svk"** etc.
+    - ``supported_subtitle_languages="all"``
+- **supported_subtitle_order**
+    - comma separated list of subtitle languages order => subtitles will be ordered according this (*NOT IMPLEMENTED*)
+    - values must be ISO codes - **"eng, cze, svk"** etc.
+    - **empty**
+    - ``supported_subtitle_order=""``
 - **unsupported_subtitles**
     - mode/action for unsupported subtitles
     - **remove** - remove stream from final file
