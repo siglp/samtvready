@@ -184,7 +184,7 @@ Always change configuration in **samtvready.conf**.
     - ``original_streams_dir="0-original-streams"``
 - **add_nomedia_file**
     - if true then add **nomedia_file_name** file into **original_streams_dir**
-    -``add_nomedia_file=true``
+    - ``add_nomedia_file=true``
 - **nomedia_file_name**
     - name for empty nomedia file
     - this file is used by some DLNA servers and means that in directory are no media
