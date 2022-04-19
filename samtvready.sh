@@ -333,7 +333,7 @@ function readCommonTrackInfo() {
     # codec type
     cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=codec_name -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
-    local codec=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    local codec=`eval $cmd|xargs|awk  -F ',' '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
     codecs_a[$stream_counter]=$codec
     myLog "DEBUG" "Track codec: ${codecs_a[$stream_counter]}"
@@ -341,7 +341,7 @@ function readCommonTrackInfo() {
     # bitrate
     cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=bit_rate -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
-    local bitrate=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    local bitrate=`eval $cmd|xargs|awk  -F ',' '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
     re='^[0-9]+$'
     if ! [[ $bitrate =~ $re ]]
@@ -356,7 +356,7 @@ function readCommonTrackInfo() {
     # delay
     cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=start_pts -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
-    local delay=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    local delay=`eval $cmd|xargs|awk  -F ',' '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
     re='^[0-9]+$'
     if ! [[ $delay =~ $re ]] 
@@ -376,7 +376,7 @@ function readVideoTrackInfo() {
     # video height
     cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=height -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
-    local height=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    local height=`eval $cmd|xargs|awk  -F ',' '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
     re='^[0-9]+$'
     if ! [[ $height =~ $re ]]
@@ -391,7 +391,7 @@ function readVideoTrackInfo() {
     # video width
     cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=width -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
-    local width=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    local width=`eval $cmd|xargs|awk  -F ',' '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
     re='^[0-9]+$'
     if ! [[ $width =~ $re ]]
@@ -432,7 +432,7 @@ function readAudioTrackInfo() {
     # number of channels format
     cmd="ffprobe -v quiet -select_streams ${indexes_a[$stream_counter]} -show_entries stream=channels -of csv=s=,:p=0 '$input_file'"
     myLog "DEBUG" "CMD: $cmd"
-    local channels=`eval $cmd|xargs|awk '{ print $1 }';result=$?`
+    local channels=`eval $cmd|xargs|awk  -F ',' '{ print $1 }';result=$?`
     myLog "DEBUG" "CMD RESULT: $result"
     re='^[0-9]+$'
     if ! [[ $channels =~ $re ]]
