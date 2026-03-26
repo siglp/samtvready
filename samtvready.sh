@@ -890,7 +890,7 @@ while read line; do
                         unsupported_video_vcodec_params="$unsupported_video_576p_params"
                     fi
                     
-                    if [ "${widths_a[$stream_counter]}" -le 480 ] || [ "${heights_a[$stream_counter]}" -le 854 ]
+                    if [ "${widths_a[$stream_counter]}" -le 854 ] || [ "${heights_a[$stream_counter]}" -le 480 ]
                     then
                         unsupported_video_vcodec_params="$unsupported_video_480p_params"
                     fi
